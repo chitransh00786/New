@@ -1,0 +1,52 @@
+[
+    {
+        "id": 1,
+        "user_id": "pewhits",
+        "username": "pewhits",
+        "email": "pewhits@gmail.com",
+        "requested_at": "2025-10-25T20:27:04.209985",
+        "status": "approved",
+        "approved_by": "admin",
+        "approved_at": "2025-10-25T20:28:33.655731"
+    },
+    {
+        "id": 2,
+        "user_id": "1",
+        "username": "pewhits",
+        "email": "pewhits@gmail.com",
+        "requested_at": "2025-10-25T20:40:24.475805",
+        "status": "approved",
+        "approved_by": "admin",
+        "approved_at": "2025-10-27T05:03:34.323268"
+    },
+    {
+        "id": 3,
+        "user_id": "2",
+        "username": "1LoVVe",
+        "email": "jitu@gmail.com",
+        "requested_at": "2025-10-27T05:48:52.185897",
+        "status": "denied",
+        "denied_by": "admin",
+        "denied_at": "2025-10-27T05:49:06.101269"
+    },
+    {
+        "id": 4,
+        "user_id": "1",
+        "username": "pewhits",
+        "email": "pewhits@gmail.com",
+        "requested_at": "2025-10-27T13:06:35.675323",
+        "status": "approved",
+        "approved_by": "admin",
+        "approved_at": "2025-10-27T13:08:22.121119"
+    },
+    {
+        "id": 5,
+        "user_id": "1",
+        "username": "pewhits",
+        "email": "pewhits@gmail.com",
+        "requested_at": "2025-10-27T15:19:45.002518",
+        "status": "approved",
+        "approved_by": "admin",
+        "approved_at": "2025-10-27T15:19:55.002284"
+    }
+]
