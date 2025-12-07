@@ -1,0 +1,3420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pew Hits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            flex-direction: column;
+        }
+
+        /* Login/Signup Modal */
+        #login-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background-color: #2727274a;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(125, 125, 125, 0.5);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            border-radius: 10px;
+            flex-direction: column;
+            align-items: center;
+            flex-wrap: wrap;
+            min-width: 350px;
+        }
+        #login-dialog h2 {
+            margin: 5px 0 20px 0;
+            text-align: center;
+        }
+        #login-dialog input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0px;
+            font-size: 16px;
+            border: 1px solid #d8d8d8;
+            background-color: transparent;
+            border-radius: 10px;
+            color: #ffffff;
+            box-sizing: border-box;
+        }
+        #login-dialog input::placeholder {
+            color: #ffffff;
+        }
+        #login-dialog button {
+            padding: 10px;
+            width: 100%;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: large;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        #login-dialog button:hover {
+            background-color: #0056b3;
+        }
+        .link-text {
+            text-align: center;
+            margin-top: 15px;
+            color: #007BFF;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .link-text:hover {
+            text-decoration: underline;
+        }
+        .error {
+            color: #ff5757;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #verification-notice {
+            background: #f5faff;
+            border: 1px solid #bde0fe;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            margin: 40px auto;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Profile Menu */
+        #profile-menu {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background-color: rgba(39, 39, 39, 0.9);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(125, 125, 125, 0.5);
+            padding: 15px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            flex-wrap: wrap;
+            align-items: stretch;
+            justify-content: center;
+            min-width: 200px;
+        }
+        #profile-menu p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        #profile-menu button {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #ffffff;
+            background-color: rgba(255, 117, 117, 0.8);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+        #profile-menu button:hover {
+            background-color: rgba(255, 117, 117, 1);
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+        .role-admin {
+            background: #f44336;
+        }
+        .role-dj {
+            background: #ff9800;
+        }
+        .role-user {
+            background: #4CAF50;
+        }
+
+        /* Main Content Layout */
+        #main-content {
+            display: none;
+            flex-direction: row;
+            width: 95%;
+            max-width: 1400px;
+            height: 95vh;
+            gap: 10px;
+        }
+
+        /* Search Panel (Left Column) */
+        #search-panel {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(125, 125, 125, 0.5);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+        #search-panel::-webkit-scrollbar {
+            display: none;
+        }
+        #search-query {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        #search-query button {
+            padding: 10px 15px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: rgba(255, 117, 117, 1);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #search-query button:hover {
+            background-color: rgb(223, 105, 105);
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            min-width: 0;
+            font-size: 16px;
+            border: 1px solid #d8d8d8;
+            background-color: transparent;
+            border-radius: 10px;
+            color: #ffffff;
+        }
+        #search-input::placeholder {
+            color: #ffffff;
+        }
+        #search-results {
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        #search-results::-webkit-scrollbar {
+            display: none;
+        }
+        .song-result {
+            padding: 12px;
+            margin: 8px 0;
+            border-bottom: 1px solid #b3b3b3;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .song-result img {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        .song-result-info {
+            flex-grow: 1;
+        }
+        .song-result p {
+            margin: 2px 0;
+            font-size: 14px;
+        }
+        .song-result button {
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .song-result button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Now Playing Panel (Center Column) */
+        #now-playing {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1 1 0;
+            min-width: 0;
+            overflow-y: auto;
+            scrollbar-width: none;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(125, 125, 125, 0.5);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        #now-playing img {
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+        .now-playing-details {
+            line-height: 1.8;
+        }
+        .now-playing-details p {
+            margin: 0px;
+        }
+        
+        #skip-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background-color: rgba(255, 117, 117, 0.9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #skip-btn:hover {
+            background-color: rgba(255, 117, 117, 1);
+        }
+
+        /* Side Panels (Right Column) */
+        #side-panels {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            min-width: 0;
+            gap: 10px;
+        }
+        #next-song-details p {
+            margin: 5px 0;
+            font-size: 14px
+        }
+        .panel {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(125, 125, 125, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .panel::-webkit-scrollbar {
+            display: none;
+        }
+        .panel h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            border-bottom: 2px solid rgba(255, 117, 117, 0.7);
+            padding-bottom: 8px;
+        }
+        .queue-item {
+            padding: 10px;
+            margin: 8px 0;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid rgba(255, 117, 117, 0.8);
+        }
+        .queue-item p {
+            margin: 3px 0;
+            font-size: 13px;
+        }
+
+        /* Promo Form */
+        #promo-upload-form input,
+        #promo-upload-form textarea,
+        #promo-upload-form button {
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* WebSocket Status */
+        .ws-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .ws-status.connected {
+            background: #4CAF50;
+        }
+        .ws-status.disconnected {
+            background: #f44336;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(125, 125, 125, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .admin-panel h3 {
+            margin: 0 0 15px 0;
+            border-bottom: 2px solid rgba(255, 117, 117, 0.7);
+            padding-bottom: 8px;
+        }
+        .admin-panel input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #d8d8d8;
+            background-color: transparent;
+            border-radius: 10px;
+            color: #ffffff;
+            box-sizing: border-box;
+        }
+        .admin-panel input::placeholder {
+            color: #ffffff;
+        }
+        .admin-panel button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+        }
+        .admin-panel button:hover {
+            background-color: #0056b3;
+        }
+        .playlist-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .playlist-item:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .playlist-item span {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 10px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .playlist-item button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #ff4757, #ff6348);
+            font-size: 13px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .playlist-item button:hover {
+            background: linear-gradient(135deg, #ff6348, #ff4757);
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.4);
+        }
+        #playlist-url {
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        #playlist-url::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        #playlist-url:focus {
+            outline: none;
+            border-color: rgba(52, 152, 219, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+        }
+        #playlist-button {
+            width: 100%;
+            margin-top: 8px;
+            padding: 10px;
+            background: rgba(255, 117, 117, 0.8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        /* iPhone-style Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 23px;
+            width: 23px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #34c759;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
+        /* Setting Item */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(125,125,125,0.3);
+        }
+        .setting-info {
+            flex: 1;
+            margin-right: 15px;
+        }
+        .setting-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        .setting-info p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .setting-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+        .type-endpoint {
+            background: #007BFF;
+        }
+        .type-broadcast {
+            background: #28a745;
+        }
+        .type-feature {
+            background: #FF9800;
+        }
+
+        #audio-player-controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #play-pause-btn {
+            font-size: 24px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #10b981; /* Green color for action */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+        }
+
+        #play-pause-btn:hover {
+            background-color: #059669;
+        }
+
+        /* Hide the default browser audio player controls */
+        #audio-stream {
+            display: none;
+        }
+
+        #stream-status {
+            color: #ffffff;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Optional: Add a pulsing effect to the button when playing */
+        .playing {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse 1.5s infinite;
+            background-color: rgba(255, 117, 117, 0.8) !important; /* Change color to red when playing/pausing */
+        }
+
+        .playing:hover {
+            background-color: rgba(255, 117, 117, 1) !important;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 117, 117, 0.8);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 117, 117, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 117, 117, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login/Signup Dialog -->
+    <div id="login-dialog">
+        <h2 id="modal-title">Login to Pew Hits Radio</h2>
+        
+        <!-- Login Form -->
+        <div id="login-form">
+            <input type="text" id="login-username" placeholder="Username" required onkeypress="if(event.key==='Enter')handleLogin()">
+            <input type="password" id="login-password" placeholder="Password" required onkeypress="if(event.key==='Enter')handleLogin()">
+            <div id="login-error" class="error"></div>
+            <button onclick="handleLogin()">Login</button>
+            <div class="link-text" onclick="showSignup()">Don't have an account? Sign up</div>
+            <div class="link-text" onclick="showForgotPassword()">Forgot Password?</div>
+        </div>
+        
+        <!-- Signup Form -->
+        <div id="signup-form" class="hidden">
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="text" id="signup-username" placeholder="Username" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <div id="signup-error" class="error"></div>
+            <button onclick="handleSignup()">Sign Up</button>
+            <div class="link-text" onclick="showLogin()">Already have an account? Login</div>
+        </div>
+
+        <!-- Forgot Password Form -->
+        <div id="forgot-form" class="hidden">
+            <input type="email" id="forgot-email" placeholder="Enter your email" required>
+            <div id="forgot-error" class="error"></div>
+            <button onclick="handleForgotPassword()">Reset Password</button>
+            <div class="link-text" onclick="showLogin()">Back to Login</div>
+        </div>
+
+        <div id="otp-dialog" class="hidden">
+            <div class="modal-content">
+                <h3 id="otp-modal-title">Enter Verification Code</h3>
+                <p id="otp-prompt">An OTP has been sent to **[email address]**. Enter it below to continue.</p>
+                <div id="otp-step-1">
+                    <input type="text" id="otp-code" placeholder="Enter OTP" required>
+                    <div id="otp-error" class="error"></div>
+                    <button onclick="handleOtpVerify()">Next (Verify OTP)</button> 
+                </div>
+                <div id="otp-step-2" class="hidden">
+                    <input type="password" id="otp-new-password" placeholder="Enter New Password" required>
+                    <button onclick="handlePasswordReset()">Set New Password</button>
+                </div>
+                <button onclick="hideOtpDialog()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Verification Notice -->
+        <div id="verification-notice" class="hidden">
+            <h3>Check your email!</h3>
+            <p>We've sent a verification link to your inbox. Please verify your account before logging in.</p>
+        </div>
+    </div>
+
+    <div class="dashboard-wrapper" class="w-full h-full flex flex-col items-center">
+
+        <!-- Header (Always visible) -->
+        <header class="glass-card flex-shrink-0 w-full p-4 flex items-center justify-between z-20 border-b border-white/10">
+            <h1 class="text-2xl font-bold text-primary-red">Pew Hits Radio</h1>
+            
+            <!-- Profile Menu Dropdown -->
+            <div class="relative">
+                <button id="profile-button" onclick="toggleProfileMenu()" class="flex items-center p-2 glass-card rounded-full hover:bg-white/10 transition-colors z-30">
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <span id="profile-username-display" class="font-semibold hidden sm:inline">User Name</span>
+                </button>
+
+                <!-- Dropdown Content (z-40 ensures it's above all panels) -->
+                <!-- Profile Menu Dropdown -->
+                <div id="profile-menu"class="absolute right-0 mt-2 w-48 glass-card rounded-lg shadow-xl overflow-hidden hidden flex-col z-40 transition-opacity duration-200 opacity-0 transform scale-95 origin-top-right">
+                    <p class="px-4 py-2 text-sm border-b border-white/10"><strong id="profile-username-display">Username</strong> <span id="profile-role-badge" class="role-badge"></span></p>
+                    <p style="font-size:12px; opacity:0.8;" id="profile-email-display">email@example.com</p>
+                    <button onclick="openProfileModal()" class="w-full text-left px-4 py-2 text-sm hover:bg-white/10 transition-colors">👤 Profile</button>
+                    <button id="admin-panel-btn" class="hidden w-full text-left px-4 py-2 text-sm hover:bg-white/10 transition-colors" onclick="toggleAdminPanel()">⚙️ Admin</button>
+                    <button id="settings-panel-btn" class="hidden w-full text-left px-4 py-2 text-sm hover:bg-white/10 transition-colors" onclick="toggleDJSettingsPanel()">🎚️ Settings</button>
+                    <button onclick="handleLogout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-900/50 transition-colors">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div id="main-content" class="flex-1 w-full max-w-[1400px] p-2 md:p-4 gap-2 md:gap-4 flex flex-col md:flex-row overflow-hidden">
+            <!-- Search Panel (Left) -->
+            <div id="search-panel" class="hidden md:flex md:w-1/4 lg:w-1/5 glass-card rounded-xl p-4 custom-scrollbar overflow-y-auto flex-col flex-shrink-0">
+                <div id="search-query" class="flex gap-2 w-full mb-3">
+                    <input id="search-input" type="text" placeholder="Search for a song..." class="flex-grow p-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-300" onkeypress="if(event.key==='Enter')searchSongs()">
+                    <button onclick="searchSongs()" class="p-2 btn-gradient rounded-lg text-white font-semibold">🔍</button>
+                </div>
+                <input id="youtube-url-input" type="text" placeholder="YouTube link (optional)" class="p-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-300 text-sm mb-2" onkeypress="if(event.key==='Enter')requestFromYouTube()">
+                <button onclick="requestFromYouTube()" class="w-full p-2 btn-gradient rounded-lg text-white font-semibold text-sm mb-3">Request from YouTube</button>
+                
+                <div id="search-results" class="flex-grow">
+                    <p style="text-align:center; opacity:0.6;">Search for songs to request...</p>
+                </div>
+            </div>
+
+            <!-- Now Playing Panel (Center) -->
+            <div id="now-playing" class="flex-1 glass-card rounded-xl p-6 flex flex-col justify-center items-center text-center overflow-y-auto custom-scrollbar">
+                <h2 class="text-3xl font-extrabold mb-8" style="color: var(--primary-red);">NOW PLAYING</h2>
+                <img id="np-albumart" src="https://via.placeholder.com/250" alt="Album Art" class="w-48 h-48 md:w-64 md:h-64 rounded-xl shadow-xl mb-6 object-cover transition-opacity duration-300">
+                <div class="now-playing-details" id="playing-details">
+                    <p id="np-title" class="text-4xl font-bold mb-1 fade-scale">Loading...</p>
+                    <p id="np-artist" class="text-xl text-white/80 mb-2 fade-scale">Loading...</p>
+                    <p id="np-album" class="text-md text-white/60 mb-4 fade-scale">Loading...</p>
+                    <p id="np-requester" class="text-sm text-white/70 mb-4 fade-scale"></p>
+                    <p id="np-timer" class="text-lg font-mono mb-2">🕒 00:00 / 00:00</p>
+                    <p id="ws-status-display" class="mb-4"><span id="ws-status" class="ws-status disconnected">⚫ Connecting...</span></p>
+                    <p id="np-listeners" class="text-sm">🎧 Listeners: <span id="listener-count">0</span></p>
+                </div>
+
+                <div id="audio-player-controls" class="mt-6 flex flex-col items-center">
+                    <button id="play-pause-btn" onclick="togglePlayPause()" class="text-3xl p-4 btn-gradient rounded-full w-20 h-20 shadow-xl font-bold transition-all hover:scale-105">▶️</button>
+                    <audio id="audio-stream" preload="none"></audio>
+                    <p id="stream-status" class="text-sm mt-2 text-white/70"></p>
+                </div>
+                <button id="skip-btn" class="hidden mt-4 p-2 btn-gradient rounded-lg text-white font-semibold text-sm hover:scale-[1.03]" onclick="skipSong()">⏭️ Skip Song</button>
+            </div>
+
+            <!-- Side Panels (Right) -->
+            <div id="side-panels" class="hidden md:flex md:w-1/4 lg:w-1/5 flex-col space-y-4 custom-scrollbar overflow-y-auto flex-shrink-0">
+                <div class="panel glass-card rounded-xl p-4 flex-shrink-0" id="next-song-panel">
+                    <h3>Next Coming</h3>
+                    <div id="next-song-details">
+                        <p>Loading next song...</p>
+                    </div>
+                </div>
+                <div class="panel glass-card rounded-xl p-4 flex-1" id="request-list-panel">
+                    <h3>Request Queue</h3>
+                    <div id="request-list">
+                        <p>No songs in queue</p>
+                    </div>
+                </div>
+                <div class="glass-card rounded-xl p-4 flex-shrink-0 hidden" id="admin-playlist-panel">
+                    <h3>🎶 Playlist Management</h3>
+                    <input type="text" id="playlist-url" placeholder="Spotify playlist URL..." class="w-full p-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-300 text-sm mb-2">
+                    <button id="playlist-button" onclick="addPlaylist()" class="w-full p-2 btn-gradient rounded-lg text-white font-semibold text-sm">Add Playlist</button>
+                    <div id="playlists-container" class="mt-3 space-y-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal (for API key copy and profile management) -->
+    <div id="profile-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; display:flex; align-items:center; justify-content:center;">
+        <div style="background:rgba(39,39,39,0.95); padding:30px; border-radius:15px; backdrop-filter:blur(20px); border:1px solid rgba(125,125,125,0.5); min-width:450px;">
+            <h2 style="margin-top:0;">Profile Information</h2>
+            <p><strong>Username:</strong> <span id="profile-username-modal"></span></p>
+            <p><strong>Email:</strong> <span id="profile-email-modal"></span></p>
+            <p><strong>Role:</strong> <span id="profile-role-modal"></span></p>
+            <p><strong>API Token:</strong></p>
+            <input type="password" id="profile-api-key" readonly onclick="copyApiKey()" style="width:100%; padding:10px; border-radius:8px; cursor:pointer; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;" title="Click to copy">
+            <p id="profile-copy-msg" style="color:#4CAF50; font-size:12px;"></p>
+            
+            <div style="margin-top:25px; display:flex; flex-direction:column; gap:10px;">
+                <button onclick="openChangeUsername()" style="padding:10px; background:#4CAF50; color:white; border:none; border-radius:8px; cursor:pointer;">✏️ Change Username</button>
+                <button onclick="openChangePassword()" style="padding:10px; background:#2196F3; color:white; border:none; border-radius:8px; cursor:pointer;">🔒 Change Password</button>
+                <button id="regenerate-api-key-btn" onclick="regenerateApiKey()" style="padding:10px; background:#FF9800; color:white; border:none; border-radius:8px; cursor:pointer;">🔑 Regenerate API Key</button>
+                <button id="request-api-key-btn" class="hidden" onclick="requestApiKey()" style="padding:10px; background:#FF5722; color:white; border:none; border-radius:8px; cursor:pointer;">🔑 Request API Key</button>
+                <button id="request-dj-btn" class="hidden" onclick="requestDJRole()" style="padding:10px; background:#9C27B0; color:white; border:none; border-radius:8px; cursor:pointer;">🎧 Request DJ Role</button>
+                <button id="request-settings-btn" class="hidden" onclick="requestSettingsAccess()" style="padding:10px; background:#FF6F00; color:white; border:none; border-radius:8px; cursor:pointer;">🎚️ Request Settings Access</button>
+            </div>
+            
+            <button onclick="closeProfileModal()" style="margin-top:20px; padding:10px 20px; background:#007BFF; color:white; border:none; border-radius:8px; cursor:pointer; width:100%;">Close</button>
+        </div>
+    </div>
+    
+    <!-- Change Username Modal -->
+    <div id="change-username-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2001; display:flex; align-items:center; justify-content:center;">
+        <div style="background:rgba(39,39,39,0.95); padding:30px; border-radius:15px; backdrop-filter:blur(20px); border:1px solid rgba(125,125,125,0.5); min-width:400px;">
+            <h2 style="margin-top:0;">Change Username</h2>
+            <input type="text" id="new-username-input" placeholder="New username" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;">
+            <p id="change-username-msg" style="font-size:12px;"></p>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button onclick="submitChangeUsername()" style="flex:1; padding:10px; background:#4CAF50; color:white; border:none; border-radius:8px; cursor:pointer;">Submit</button>
+                <button onclick="closeChangeUsername()" style="flex:1; padding:10px; background:#666; color:white; border:none; border-radius:8px; cursor:pointer;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Change Password Modal -->
+    <div id="change-password-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2001; display:flex; align-items:center; justify-content:center;">
+        <div style="background:rgba(39,39,39,0.95); padding:30px; border-radius:15px; backdrop-filter:blur(20px); border:1px solid rgba(125,125,125,0.5); min-width:400px;">
+            <h2 style="margin-top:0;">Change Password</h2>
+            <input type="password" id="current-password-input" placeholder="Current password" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;">
+            <input type="password" id="new-password-input" placeholder="New password" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;">
+            <p id="change-password-msg" style="font-size:12px;"></p>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button onclick="submitChangePassword()" style="flex:1; padding:10px; background:#2196F3; color:white; border:none; border-radius:8px; cursor:pointer;">Submit</button>
+                <button onclick="closeChangePassword()" style="flex:1; padding:10px; background:#666; color:white; border:none; border-radius:8px; cursor:pointer;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Management Modal (Users & Role Requests) -->
+    <div id="admin-users-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; display:flex; align-items:center; justify-content:center; overflow-y:auto;">
+        <div style="background:rgba(39,39,39,0.95); padding:30px; border-radius:15px; backdrop-filter:blur(20px); border:1px solid rgba(125,125,125,0.5); scrollbar-width: none; min-width:700px; max-width:90%; max-height:85vh; overflow-y:auto;">
+            <h2 style="margin-top:0;">⚙️ Admin Panel</h2>
+            
+            <!-- Tabs -->
+            <div style="display:flex; gap:5px; margin-bottom:20px; border-bottom:2px solid rgba(255,255,255,0.1); padding-bottom:10px; flex-wrap:wrap;">
+                <button id="tab-users" onclick="switchAdminTab('users')" style="padding:10px 15px; background:#007BFF; color:white; border:none; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px;">👥 Users</button>
+                <button id="tab-role-requests" onclick="switchAdminTab('role-requests')" style="padding:10px 15px; background:#666; color:white; border:none; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px;">📩 DJ Requests</button>
+                <button id="tab-api-key-requests" onclick="switchAdminTab('api-key-requests')" style="padding:10px 15px; background:#666; color:white; border:none; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px;">🔑 API Keys</button>
+                <button id="tab-settings" onclick="switchAdminTab('settings')" style="padding:10px 15px; background:#666; color:white; border:none; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px;">⚙️ Settings</button>
+                <button id="tab-settings-requests" onclick="switchAdminTab('settings-requests')" style="padding:10px 15px; background:#666; color:white; border:none; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px;">🎚️ DJ Access</button>
+                <button id="tab-clients" onclick="switchAdminTab('clients')" style="padding:10px 15px; background:#666; color:white; border:none; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px;">👮 Clients</button>
+                <button id="tab-promotions" onclick="switchAdminTab('promotions')" style="padding:10px 15px; background:#666; color:white; border:none; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px;">📢 Promotions</button>
+            </div>
+            
+            <!-- Users Tab -->
+            <div id="admin-users-content" style="margin:20px 0;">
+                <div id="users-list">
+                    <p style="text-align:center; opacity:0.6;">Loading users...</p>
+                </div>
+            </div>
+            
+            <!-- Role Requests Tab -->
+            <div id="admin-role-requests-content" class="hidden" style="margin:20px 0;">
+                <div id="role-requests-list">
+                    <p style="text-align:center; opacity:0.6;">Loading requests...</p>
+                </div>
+            </div>
+            
+            <!-- API Key Requests Tab -->
+            <div id="admin-api-key-requests-content" class="hidden" style="margin:20px 0;">
+                <div id="api-key-requests-list">
+                    <p style="text-align:center; opacity:0.6;">Loading requests...</p>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div id="admin-settings-content" class="hidden" style="margin:20px 0;">
+                <p style="margin-bottom:15px; opacity:0.8;">Toggle system features, endpoints, and broadcasts on/off:</p>
+                <div id="settings-list" style="display:grid; gap:15px;">
+                    <p style="text-align:center; opacity:0.6;">Loading settings...</p>
+                </div>
+            </div>
+            
+            <!-- Settings Access Requests Tab -->
+            <div id="admin-settings-requests-content" class="hidden" style="margin:20px 0;">
+                <p style="margin-bottom:15px; opacity:0.8;">DJ settings access requests awaiting approval:</p>
+                <div id="settings-requests-list">
+                    <p style="text-align:center; opacity:0.6;">Loading requests...</p>
+                </div>
+            </div>
+            
+            <!-- Client Management Tab -->
+            <div id="admin-clients-content" class="hidden" style="margin:20px 0;">
+                <!-- Sub-tabs -->
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <button id="subtab-connected" onclick="switchClientSubTab('connected')" style="padding:8px 15px; background:#28a745; color:white; border:none; border-radius:6px; cursor:pointer; font-size:12px;">🟢 Connected</button>
+                    <button id="subtab-banned" onclick="switchClientSubTab('banned')" style="padding:8px 15px; background:#666; color:white; border:none; border-radius:6px; cursor:pointer; font-size:12px;">🚫 Banned</button>
+                    <button id="subtab-actions" onclick="switchClientSubTab('actions')" style="padding:8px 15px; background:#666; color:white; border:none; border-radius:6px; cursor:pointer; font-size:12px;">📜 Action Log</button>
+                </div>
+                
+                <!-- Connected Clients -->
+                <div id="clients-connected-content">
+                    <div id="connected-clients-list">
+                        <p style="text-align:center; opacity:0.6;">Loading connected clients...</p>
+                    </div>
+                </div>
+                
+                <!-- Banned Clients -->
+                <div id="clients-banned-content" class="hidden">
+                    <div id="banned-clients-list">
+                        <p style="text-align:center; opacity:0.6;">Loading banned clients...</p>
+                    </div>
+                </div>
+                
+                <!-- Action Log -->
+                <div id="clients-actions-content" class="hidden">
+                    <div id="client-actions-list">
+                        <p style="text-align:center; opacity:0.6;">Loading actions...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Promotions Tab -->
+            <div id="admin-promotions-content" class="hidden" style="margin:20px 0;">
+                <!-- Upload Promo Form -->
+                <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; margin-bottom:20px;">
+                    <h3 style="margin-top:0;">📢 Upload New Promotion</h3>
+                    <form id="promo-upload-form" onsubmit="uploadPromotion(event)">
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">Promo Name *</label>
+                            <input type="text" id="promo-name" required style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;">
+                        </div>
+                        
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">Promoter *</label>
+                            <input type="text" id="promo-promoter" required style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;">
+                        </div>
+                        
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">Description *</label>
+                            <textarea id="promo-description" required rows="3" style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white; resize:vertical;"></textarea>
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                            <div>
+                                <label style="display:block; margin-bottom:5px; font-weight:bold;">Start Date & Time *</label>
+                                <input type="datetime-local" id="promo-from" required style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;">
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:5px; font-weight:bold;">End Date & Time *</label>
+                                <input type="datetime-local" id="promo-to" required style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">Audio File (MP3 only) *</label>
+                            <input type="file" id="promo-audio" accept=".mp3" required style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid #d8d8d8; color:white;">
+                        </div>
+                        
+                        <p id="promo-upload-msg" style="font-size:12px; margin-bottom:10px;"></p>
+                        
+                        <button type="submit" style="width:100%; padding:12px; background:#4CAF50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">
+                            📤 Upload Promotion
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Active Promotions List -->
+                <div style="margin-top:25px;">
+                    <h3>🎤 Active Promotions</h3>
+                    <div id="active-promotions-list">
+                        <p style="text-align:center; opacity:0.6;">Loading active promotions...</p>
+                    </div>
+                </div>
+                
+                <!-- All Promotions List -->
+                <div style="margin-top:25px;">
+                    <h3>📋 All Promotions</h3>
+                    <div id="all-promotions-list">
+                        <p style="text-align:center; opacity:0.6;">Loading all promotions...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="closeAdminUsersModal()" style="margin-top:20px; padding:10px 20px; background:#007BFF; color:white; border:none; border-radius:8px; cursor:pointer; width:100%;">Close</button>
+        </div>
+    </div>
+
+    <!-- DJ Settings Modal -->
+    <div id="dj-settings-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; display:flex; align-items:center; justify-content:center; overflow-y:auto;">
+        <div style="background:rgba(39,39,39,0.95); padding:30px; border-radius:15px; backdrop-filter:blur(20px); border:1px solid rgba(125,125,125,0.5); min-width:600px; max-width:90%; max-height:85vh; overflow-y:auto;">
+            <h2 style="margin-top:0;">🎚️ Settings Panel</h2>
+            <p style="margin-bottom:15px; opacity:0.8;">Toggle system features, endpoints, and broadcasts on/off:</p>
+            <div id="dj-settings-list" style="display:grid; gap:15px;">
+                <p style="text-align:center; opacity:0.6;">Loading settings...</p>
+            </div>
+            <button onclick="closeDJSettingsModal()" style="margin-top:20px; padding:10px 20px; background:#007BFF; color:white; border:none; border-radius:8px; cursor:pointer; width:100%;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let token = localStorage.getItem('access_token');
+        let currentUser = null;
+
+        // Initialize on page load
+        if (token) {
+            verifyToken();
+        } else {
+            document.getElementById('login-dialog').style.display = 'flex';
+        }
+
+        async function verifyToken() {
+            try {
+                const res = await fetch('/api/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser = data.user;
+                    hideLoginDialog();
+                    setupDashboard();
+                } else {
+                    localStorage.removeItem('access_token');
+                    document.getElementById('login-dialog').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Token verification failed:', error);
+                localStorage.removeItem('access_token');
+                document.getElementById('login-dialog').style.display = 'flex';
+            }
+        }
+
+        function hideLoginDialog() {
+            document.getElementById('login-dialog').style.display = 'none';
+        }
+
+        function showLogin() {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('signup-form').classList.add('hidden');
+            document.getElementById('forgot-form').classList.add('hidden');
+            document.getElementById('modal-title').textContent = 'Login to Pew Hits Radio';
+            document.getElementById('signup-error').textContent = '';
+        }
+
+        function showSignup() {
+            document.getElementById('signup-form').classList.remove('hidden');
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('modal-title').textContent = 'Create Account';
+            document.getElementById('login-error').textContent = '';
+        }
+
+        function showForgotPassword() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('signup-form').classList.add('hidden');
+            document.getElementById('forgot-form').classList.remove('hidden');
+            document.getElementById('modal-title').textContent = 'Reset Password';
+            document.getElementById('login-error').textContent = '';
+            document.getElementById('signup-error').textContent = '';
+        }
+
+        async function handleLogin() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+
+            errorEl.textContent = ''; // Clear previous errors
+
+            if (!username || !password) {
+                errorEl.textContent = 'Please fill in all fields';
+                return;
+            }
+
+            try {
+                    const res = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    // Handle Forbidden (403) status: UNVERIFIED or BANNED
+                    if (res.status === 403) {
+                        const data = await res.json();
+                        errorEl.textContent = data.error || 'Account access forbidden.';
+                        errorEl.style.color = 'red';
+                        return; 
+                    }
+
+                    const data = await res.json();
+
+                    // Handle successful response (res.ok)
+                    if (res.ok) {
+                        token = data.access_token;
+                        localStorage.setItem('access_token', token);
+
+                        // Fetch user details (which should now return is_muted if your /api/me endpoint is updated)
+                        const userRes = await fetch('/api/me', {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const userData = await userRes.json();
+                        currentUser = userData.user;
+
+                        // --- NEW: Check Mute Status from Login Response ---
+                        if (data.user && data.user.is_muted) {
+                            // Since we cannot use custom modals here, we use alert() as the immediate popup.
+                            alert("🔇 You are currently MUTED.\n\n" +
+                                "This means you CANNOT request new songs, skip songs, or participate in chat until your mute expires. " +
+                                "Please contact an admin if you believe this is an error."
+                            ); 
+                        }
+                        // --- END NEW MUTE CHECK ---
+
+                        hideLoginDialog();
+                        setupDashboard();
+                    } else {
+                        // Handle other non-ok status codes (e.g., 401 Invalid credentials)
+                        errorEl.textContent = data.error || 'Login failed';
+                        errorEl.style.color = 'red';
+                    }
+                } catch (error) {
+                    console.error("Login Network Error:", error);
+                    errorEl.textContent = 'Network error. Please try again.';
+                    errorEl.style.color = 'red';
+                }
+            }
+
+        async function handleSignup() {
+            const email = document.getElementById('signup-email').value;
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+            const errorEl = document.getElementById('signup-error');
+            const formEl = document.getElementById('signup-form'); // Reference the form container
+
+            if (!email || !username || !password) {
+                errorEl.textContent = 'Please fill in all fields';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // SUCCESS: Registration successful, but NOT logged in.
+
+                    // 1. Clear the signup form content
+                    formEl.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <h3 style="color: green;">🎉 Account Created!</h3>
+                            <p>
+                                We sent a verification link to <strong>${email}</strong>.<br>
+                                Please check your inbox (and spam folder) to activate your account.
+                            </p>
+                            <p style="margin-top: 20px;">
+                                Once verified, you can return here to **Login**.
+                            </p>
+                            <div class="link-text" onclick="showLogin()" style="margin-top: 20px; font-weight: bold;">
+                                Back to Login
+                            </div>
+                        </div>
+                    `;
+
+                } else {
+                    // FAILURE: Display error from the server (e.g., user already exists)
+                    errorEl.textContent = data.error || 'Signup failed';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Network error. Please try again.';
+            }
+        }
+
+        function checkUrlForVerificationStatus() {
+            // Get the current URL's query parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const error = urlParams.get('error');
+
+            if (status === 'email_verified') {
+                // Successful verification
+                showLogin(); // Show the login form
+                const loginErrorEl = document.getElementById('login-error');
+                loginErrorEl.textContent = "✅ Success! Your email is verified. Please log in with your new account.";
+                loginErrorEl.style.color = 'green';
+                
+                // Optional: Clean the URL so the message doesn't persist on refresh
+                window.history.replaceState(null, null, window.location.pathname); 
+
+            } else if (status === 'verification_failed') {
+                // Failed verification
+                showLogin(); // Show the login form
+                const loginErrorEl = document.getElementById('login-error');
+                loginErrorEl.textContent = `❌ Verification failed. The link was ${error === 'invalid_token' ? 'invalid or expired.' : 'not processed due to a server error.'} Please sign up or request a password reset again.`;
+                loginErrorEl.style.color = 'red';
+                
+                // Optional: Clean the URL
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+        }
+
+        async function handleForgotPassword() {
+            const email = document.getElementById('forgot-email').value;
+            const errorEl = document.getElementById('forgot-error');
+
+            // 1. Basic validation
+            if (!email) {
+                errorEl.textContent = 'Please enter your email address.';
+                return;
+            }
+            
+            // Clear any previous error
+            errorEl.textContent = ''; 
+
+            try {
+                // 2. API Call to request password reset (sends OTP)
+                const res = await fetch('/api/auth/forgot-password', { // Endpoint you specified
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // 3. Success: Show the OTP verification dialog
+                    errorEl.textContent = 'A One-Time Password (OTP) has been sent to your email.';
+                    // Delay showing the OTP dialog slightly to let the user read the message
+                    setTimeout(() => {
+                        showOtpDialog(email); // Pass the email so we know which user to verify
+                    }, 1500);
+                    
+                } else {
+                    // 4. Failure: Display error from the server
+                    errorEl.textContent = data.error || 'Failed to initiate password reset. Please check your email.';
+                }
+            } catch (error) {
+                // 5. Network/other error
+                console.error('Password Reset Error:', error);
+                errorEl.textContent = 'Network error. Could not reach the server.';
+            }
+        }
+
+        // Variable to store the email during the reset process
+        let currentResetEmail = null; 
+        let verifiedOTP = null; // <-- New variable to store the verified OTP
+
+        function showOtpDialog(email) {
+            currentResetEmail = email; 
+            verifiedOTP = null; // Ensure OTP is cleared on new dialog show
+            
+            document.getElementById('otp-dialog').classList.remove('hidden'); 
+            
+            // Update the prompt and clear previous state
+            const promptEl = document.getElementById('otp-prompt');
+            promptEl.innerHTML = `An OTP has been sent to <strong>${email}</strong>. Enter it below to continue.`;
+            document.getElementById('otp-modal-title').textContent = 'Enter Verification Code';
+
+            // Reset visibility and inputs
+            document.getElementById('otp-step-1').classList.remove('hidden');
+            document.getElementById('otp-step-2').classList.add('hidden');
+            document.getElementById('otp-code').value = '';
+            document.getElementById('otp-new-password').value = '';
+            document.getElementById('otp-error').textContent = '';
+        }
+
+        function hideOtpDialog() {
+            document.getElementById('otp-dialog').classList.add('hidden');
+            document.getElementById('otp-code').value = '';
+            document.getElementById('otp-new-password').value = '';
+            document.getElementById('otp-error').textContent = '';
+            currentResetEmail = null;
+            verifiedOTP = null; // Important: Clear all reset state
+            
+            // Reset the visibility of the steps
+            document.getElementById('otp-step-1').classList.remove('hidden');
+            document.getElementById('otp-step-2').classList.add('hidden');
+        }
+
+        async function handleOtpVerify() {
+            const otp = document.getElementById('otp-code').value;
+            const errorEl = document.getElementById('otp-error');
+            const email = currentResetEmail; 
+
+            if (!email || !otp) {
+                errorEl.textContent = 'Please enter the OTP.';
+                errorEl.style.color = 'red';
+                return;
+            }
+            
+            errorEl.textContent = ''; 
+            errorEl.style.color = 'red';
+
+            try {
+                // HITS YOUR ENDPOINT: /api/auth/verify-otp
+                const res = await fetch('/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // SUCCESS: OTP is valid. Store the OTP and transition.
+                    verifiedOTP = otp; // *** Store the verified OTP ***
+                    errorEl.textContent = '✅ OTP verified! You can now set a new password.';
+                    errorEl.style.color = 'green';
+                    
+                    // Transition to Step 2
+                    document.getElementById('otp-step-1').classList.add('hidden');
+                    document.getElementById('otp-step-2').classList.remove('hidden');
+                    document.getElementById('otp-modal-title').textContent = 'Set New Password';
+                    document.getElementById('otp-prompt').textContent = 'Enter and confirm your new password.';
+                    
+                } else {
+                    // FAILURE: Invalid or expired OTP
+                    errorEl.textContent = data.error || 'Invalid or expired OTP. Please try again.';
+                }
+            } catch (error) {
+                console.error('OTP Verification Error:', error);
+                errorEl.textContent = 'Network error during verification.';
+            }
+        }
+
+        async function handlePasswordReset() {
+            const newPassword = document.getElementById('otp-new-password').value;
+            const errorEl = document.getElementById('otp-error');
+            const email = currentResetEmail;
+            
+            // Use the globally stored OTP
+            const otp = verifiedOTP; 
+
+            // Basic validation
+            if (!newPassword) {
+                errorEl.textContent = 'Please enter a new password.';
+                return;
+            }
+            if (!otp) {
+                errorEl.textContent = 'Verification error. Please try verifying the OTP again.';
+                return;
+            }
+
+            errorEl.textContent = ''; 
+
+            try {
+                // HITS YOUR ENDPOINT: /api/auth/reset-password
+                // Sends Email, the *stored* OTP, and the New Password in one request
+                const res = await fetch('/api/auth/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email, 
+                        otp, // Sent the stored OTP
+                        new_password: newPassword 
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // SUCCESS: Password updated
+                    errorEl.textContent = '✅ Password successfully reset! Please log in with your new password.';
+                    errorEl.style.color = 'green';
+                    
+                    // Redirect to login form after a short delay
+                    setTimeout(() => {
+                        hideOtpDialog();
+                        showLogin(); 
+                    }, 3000);
+                    
+                } else {
+                    // FAILURE: Display error (e.g., strong password requirement failure)
+                    errorEl.textContent = data.error || 'Failed to reset password.';
+                }
+
+            } catch (error) {
+                console.error('Password Reset Error:', error);
+                errorEl.textContent = 'Network error. Could not reset password.';
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('access_token');
+            token = null;
+            currentUser = null;
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('login-dialog').style.display = 'flex';
+        }
+        
+        
+        let currentStreamUrl = '';
+        let isPlaying = false; 
+        const audio = document.getElementById('audio-stream');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const streamStatusEl = document.getElementById('stream-status');
+        
+
+        // --- 1. Stream Initialization (Load Source) ---
+
+        async function fetchStreamUrl() {
+            const audio = document.getElementById('audio-stream');
+            const streamStatusEl = document.getElementById('stream-status');
+
+
+            if (!audio || !streamStatusEl) return;
+            
+            try {
+                streamStatusEl.textContent = 'Loading stream info...';
+                const res = await fetch('/api/get-stream-url');
+                const data = await res.json();
+                
+                if (data.url) {
+                    currentStreamUrl = data.url;
+                }
+                streamStatusEl.textContent = 'Ready to play';
+
+            } catch (error) {
+                console.error("Error fetching stream URL, using default:", error);
+                streamStatusEl.textContent = 'Using default stream URL. Click play to try.';
+            }
+            
+            // Set the source but DO NOT start loading yet (due to preload="none" in HTML)
+            audio.src = currentStreamUrl;
+        }
+
+
+        // --- 2. Play/Pause Toggle (Force Reload on Play) ---
+
+        function togglePlayPause() {
+            const audio = document.getElementById('audio-stream');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const streamStatusEl = document.getElementById('stream-status');
+
+            if (!currentStreamUrl || !audio) {
+                streamStatusEl.textContent = 'Error: Player not initialized.';
+                return;
+            }
+
+            if (isPlaying) {
+                // --- ACTION: PAUSE ---
+                audio.pause();
+                isPlaying = false;
+                playPauseBtn.innerHTML = '▶️';
+                playPauseBtn.classList.remove('playing');
+                streamStatusEl.textContent = 'Paused';
+            } else {
+                // --- ACTION: PLAY (FORCE RELOAD CRITICAL FOR LIVE STREAM) ---
+                
+                // 1. Force reload the stream source to ensure a fresh connection
+                audio.src = currentStreamUrl; 
+                audio.load();               
+                
+                // 2. Attempt to play (requires user gesture)
+                audio.play()
+                    .then(() => {
+                        isPlaying = true;
+                        playPauseBtn.innerHTML = '⏸️';
+                        playPauseBtn.classList.add('playing');
+                        streamStatusEl.textContent = 'Playing...';
+                    })
+                    .catch(e => {
+                        // Failure (e.g., connection error or browser blocking autoplay)
+                        console.error("Playback failed:", e);
+                        isPlaying = false;
+                        playPauseBtn.innerHTML = '▶️ ‼️';
+                        playPauseBtn.classList.remove('playing');
+                        streamStatusEl.textContent = 'Playback failed. Click again to retry.';
+                    });
+            }
+        }
+
+        // --- 3. Audio Event Handlers (Feedback) ---
+
+        function setupAudioListeners() {
+            if (!audio || !streamStatusEl || !playPauseBtn) return;
+
+            // Fired when the browser is buffering/waiting for data
+            audio.addEventListener('waiting', () => {
+                streamStatusEl.textContent = 'Buffering...';
+            });
+
+            // Fired when the stream successfully starts playing
+            audio.addEventListener('playing', () => {
+                streamStatusEl.textContent = 'Live Stream';
+            });
+
+            // Fired when the stream link encounters a major error
+            audio.addEventListener('error', () => {
+                isPlaying = false;
+                playPauseBtn.innerHTML = '⚠️ Error';
+                playPauseBtn.classList.remove('playing');
+                streamStatusEl.textContent = 'Stream error. Check URL.';
+            });
+        }
+
+        async function setupDashboard() {
+            // Setup profile menu
+            document.getElementById('profile-username-display').textContent = currentUser.username;
+            document.getElementById('profile-email-display').textContent = currentUser.email;
+            document.getElementById('profile-role-badge').textContent = currentUser.role.toUpperCase();
+            document.getElementById('profile-role-badge').className = `role-badge role-${currentUser.role}`;
+
+            // Show main content
+            document.getElementById('main-content').style.display = 'flex';
+
+            // Show skip button for DJ and Admin
+            if (currentUser.role === 'dj' || currentUser.role === 'admin') {
+                document.getElementById('skip-btn').classList.remove('hidden');
+            }
+
+            // Show admin panel button for admins only
+            if (currentUser.role === 'admin') {
+                document.getElementById('admin-panel-btn').classList.remove('hidden');
+                document.getElementById('admin-playlist-panel').classList.remove('hidden');
+                loadPlaylists();
+            }
+
+            // Check if DJ has approved settings access
+            if (currentUser.role === 'dj') {
+                await checkDJSettingsAccess();
+            }
+
+            // Connect WebSocket
+            connectWebSocket();
+
+            // Load initial data
+            loadInitialData();
+
+            fetchStreamUrl();
+            setupAudioListeners();
+        }
+
+        async function checkDJSettingsAccess() {
+            try {
+                const res = await fetch('/api/settings/check-access', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                
+                if (res.ok && data.has_access) {
+                    // DJ has approved settings access, show the button
+                    document.getElementById('settings-panel-btn').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Failed to check settings access:', error);
+            }
+        }
+
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profile-menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function openProfileModal() {
+            document.getElementById('profile-username-modal').textContent = currentUser.username;
+            document.getElementById('profile-email-modal').textContent = currentUser.email;
+            document.getElementById('profile-role-modal').textContent = currentUser.role;
+            document.getElementById('profile-api-key').value = currentUser.api_key || 'No API Key';
+            
+            // Show/hide API key buttons based on whether user has API key
+            if (currentUser.api_key) {
+                document.getElementById('regenerate-api-key-btn').classList.remove('hidden');
+                document.getElementById('request-api-key-btn').classList.add('hidden');
+            } else {
+                document.getElementById('regenerate-api-key-btn').classList.add('hidden');
+                document.getElementById('request-api-key-btn').classList.remove('hidden');
+            }
+            
+            // Show DJ request button only for regular users
+            if (currentUser.role === 'user') {
+                document.getElementById('request-dj-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('request-dj-btn').classList.add('hidden');
+            }
+            
+            // Show settings access request button only for DJs (admins already have full access)
+            if (currentUser.role === 'dj') {
+                document.getElementById('request-settings-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('request-settings-btn').classList.add('hidden');
+            }
+            
+            document.getElementById('profile-modal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+            document.getElementById('profile-copy-msg').textContent = '';
+        }
+
+        function copyApiKey() {
+            const apiKeyInput = document.getElementById('profile-api-key');
+            apiKeyInput.type = 'text';
+            apiKeyInput.select();
+            document.execCommand('copy');
+            apiKeyInput.type = 'password';
+            document.getElementById('profile-copy-msg').textContent = '✓ API key copied to clipboard!';
+        }
+
+        async function toggleAdminPanel() {
+            document.getElementById('admin-users-modal').classList.remove('hidden');
+            await switchAdminTab('users');
+        }
+
+        function closeAdminUsersModal() {
+            document.getElementById('admin-users-modal').classList.add('hidden');
+        }
+
+        async function toggleDJSettingsPanel() {
+            document.getElementById('dj-settings-modal').classList.remove('hidden');
+            await loadDJSettings();
+        }
+
+        function closeDJSettingsModal() {
+            document.getElementById('dj-settings-modal').classList.add('hidden');
+        }
+
+        async function loadDJSettings() {
+            try {
+                const res = await fetch('/api/settings', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    const listEl = document.getElementById('dj-settings-list');
+                    if (data.settings.length === 0) {
+                        listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No settings available</p>';
+                    } else {
+                        listEl.innerHTML = data.settings.map(setting => `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(255,255,255,0.05); border-radius:10px;">
+                                <div>
+                                    <strong>${setting.display_name}</strong>
+                                    <p style="font-size:12px; opacity:0.7; margin:5px 0 0 0;">${setting.description}</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" ${setting.enabled ? 'checked' : ''} onchange="toggleSetting('${setting.name}', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    document.getElementById('dj-settings-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Access denied or failed to load settings</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load DJ settings:', error);
+                document.getElementById('dj-settings-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load settings</p>';
+            }
+        }
+
+        async function switchAdminTab(tab) {
+            // Update tab buttons
+            document.getElementById('tab-users').style.background = '#666';
+            document.getElementById('tab-role-requests').style.background = '#666';
+            document.getElementById('tab-api-key-requests').style.background = '#666';
+            document.getElementById('tab-settings').style.background = '#666';
+            document.getElementById('tab-settings-requests').style.background = '#666';
+            document.getElementById('tab-clients').style.background = '#666';
+            document.getElementById('tab-promotions').style.background = '#666';
+            
+            document.getElementById('admin-users-content').classList.add('hidden');
+            document.getElementById('admin-role-requests-content').classList.add('hidden');
+            document.getElementById('admin-api-key-requests-content').classList.add('hidden');
+            document.getElementById('admin-settings-content').classList.add('hidden');
+            document.getElementById('admin-settings-requests-content').classList.add('hidden');
+            document.getElementById('admin-clients-content').classList.add('hidden');
+            document.getElementById('admin-promotions-content').classList.add('hidden');
+            
+            if (tab === 'users') {
+                document.getElementById('tab-users').style.background = '#007BFF';
+                document.getElementById('admin-users-content').classList.remove('hidden');
+                await loadUsers();
+            } else if (tab === 'role-requests') {
+                document.getElementById('tab-role-requests').style.background = '#007BFF';
+                document.getElementById('admin-role-requests-content').classList.remove('hidden');
+                await loadRoleRequests();
+            } else if (tab === 'api-key-requests') {
+                document.getElementById('tab-api-key-requests').style.background = '#007BFF';
+                document.getElementById('admin-api-key-requests-content').classList.remove('hidden');
+                await loadApiKeyRequests();
+            } else if (tab === 'settings') {
+                document.getElementById('tab-settings').style.background = '#007BFF';
+                document.getElementById('admin-settings-content').classList.remove('hidden');
+                await loadSettings();
+            } else if (tab === 'settings-requests') {
+                document.getElementById('tab-settings-requests').style.background = '#007BFF';
+                document.getElementById('admin-settings-requests-content').classList.remove('hidden');
+                await loadSettingsAccessRequests();
+            } else if (tab === 'clients') {
+                document.getElementById('tab-clients').style.background = '#007BFF';
+                document.getElementById('admin-clients-content').classList.remove('hidden');
+                await switchClientSubTab('connected');
+            } else if (tab === 'promotions') {
+                document.getElementById('tab-promotions').style.background = '#007BFF';
+                document.getElementById('admin-promotions-content').classList.remove('hidden');
+                await loadPromotions();
+            }
+        }
+
+        async function loadRoleRequests() {
+            try {
+                const res = await fetch('/api/role-requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const listEl = document.getElementById('role-requests-list');
+                if (data.requests && data.requests.length > 0) {
+                    listEl.innerHTML = data.requests.map(req => `
+                        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);">
+                            <p><strong>${req.username}</strong> (${req.email})</p>
+                            <p style="font-size:12px; opacity:0.7;">Requested: ${new Date(req.requested_at).toLocaleString()}</p>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button onclick="approveRoleRequest(${req.id})" style="flex:1; padding:8px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer;">✓ Approve</button>
+                                <button onclick="denyRoleRequest(${req.id})" style="flex:1; padding:8px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer;">✕ Deny</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No pending role requests</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load role requests:', error);
+                document.getElementById('role-requests-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load requests</p>';
+            }
+        }
+
+        async function approveRoleRequest(requestId) {
+            if (!confirm('Approve this DJ role request?')) return;
+
+            try {
+                const res = await fetch('/api/role-requests/approve', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ request_id: requestId })
+                });
+
+                if (res.ok) {
+                    alert('✓ DJ role granted!');
+                    await loadRoleRequests();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to approve request');
+                }
+            } catch (error) {
+                console.error('Approve failed:', error);
+                alert('Failed to approve request');
+            }
+        }
+
+        async function denyRoleRequest(requestId) {
+            if (!confirm('Deny this DJ role request?')) return;
+
+            try {
+                const res = await fetch('/api/role-requests/deny', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ request_id: requestId })
+                });
+
+                if (res.ok) {
+                    alert('✓ Request denied');
+                    await loadRoleRequests();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to deny request');
+                }
+            } catch (error) {
+                console.error('Deny failed:', error);
+                alert('Failed to deny request');
+            }
+        }
+
+        async function loadApiKeyRequests() {
+            try {
+                const res = await fetch('/api/api-key-requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const listEl = document.getElementById('api-key-requests-list');
+                if (data.requests && data.requests.length > 0) {
+                    listEl.innerHTML = data.requests.map(req => `
+                        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);">
+                            <p><strong>${req.username}</strong> (${req.email})</p>
+                            <p style="font-size:12px; opacity:0.7;">Requested: ${new Date(req.requested_at).toLocaleString()}</p>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button onclick="approveApiKeyRequest(${req.id})" style="flex:1; padding:8px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer;">✓ Approve</button>
+                                <button onclick="denyApiKeyRequest(${req.id})" style="flex:1; padding:8px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer;">✕ Deny</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No pending API key requests</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load API key requests:', error);
+                document.getElementById('api-key-requests-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load requests</p>';
+            }
+        }
+
+        async function approveApiKeyRequest(requestId) {
+            if (!confirm('Approve this API key request?')) return;
+
+            try {
+                const res = await fetch('/api/api-key-requests/approve', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ request_id: requestId })
+                });
+
+                if (res.ok) {
+                    alert('✓ API key granted!');
+                    await loadApiKeyRequests();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to approve request');
+                }
+            } catch (error) {
+                console.error('Approve failed:', error);
+                alert('Failed to approve request');
+            }
+        }
+
+        async function denyApiKeyRequest(requestId) {
+            if (!confirm('Deny this API key request?')) return;
+
+            try {
+                const res = await fetch('/api/api-key-requests/deny', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ request_id: requestId })
+                });
+
+                if (res.ok) {
+                    alert('✓ Request denied');
+                    await loadApiKeyRequests();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to deny request');
+                }
+            } catch (error) {
+                console.error('Deny failed:', error);
+                alert('Failed to deny request');
+            }
+        }
+
+        // ============= SETTINGS MANAGEMENT =============
+        
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/settings', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const listEl = document.getElementById('settings-list');
+                if (data.success && data.settings && data.settings.length > 0) {
+                    const grouped = {
+                        'endpoint': [],
+                        'broadcast': [],
+                        'feature': []
+                    };
+                    
+                    data.settings.forEach(setting => {
+                        grouped[setting.type].push(setting);
+                    });
+
+                    listEl.innerHTML = `
+                        <div style="margin-bottom:20px;">
+                            <h3 style="color:#007BFF; margin-bottom:10px;">🌐 API Endpoints</h3>
+                            ${grouped['endpoint'].map(s => createSettingToggle(s)).join('')}
+                        </div>
+                        <div style="margin-bottom:20px;">
+                            <h3 style="color:#4CAF50; margin-bottom:10px;">📡 WebSocket Broadcasts</h3>
+                            ${grouped['broadcast'].map(s => createSettingToggle(s)).join('')}
+                        </div>
+                        <div style="margin-bottom:20px;">
+                            <h3 style="color:#FF9800; margin-bottom:10px;">⭐ Features</h3>
+                            ${grouped['feature'].map(s => createSettingToggle(s)).join('')}
+                        </div>
+                    `;
+                } else {
+                    listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No settings found</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+                document.getElementById('settings-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load settings</p>';
+            }
+        }
+
+        function createSettingToggle(setting) {
+            return `
+                <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <p style="font-weight:bold; margin:2px 0;">${setting.display_name}</p>
+                        <p style="font-size:12px; opacity:0.7; margin:2px 0;">${setting.description || ''}</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${setting.enabled ? 'checked' : ''} onchange="toggleSetting('${setting.name}', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            `;
+        }
+
+        async function toggleSetting(settingName, enabled) {
+            try {
+                const res = await fetch('/api/settings/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: settingName, enabled: enabled })
+                });
+
+                if (res.ok) {
+                    console.log(`✓ Setting '${settingName}' toggled to ${enabled ? 'ON' : 'OFF'}`);
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to toggle setting');
+                    await loadSettings(); // Reload to reset UI
+                }
+            } catch (error) {
+                console.error('Failed to toggle setting:', error);
+                alert('Failed to toggle setting');
+                await loadSettings(); // Reload to reset UI
+            }
+        }
+
+        async function loadSettingsAccessRequests() {
+            try {
+                const res = await fetch('/api/settings/access-requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const listEl = document.getElementById('settings-requests-list');
+                if (data.success && data.requests && data.requests.length > 0) {
+                    listEl.innerHTML = data.requests.map(req => `
+                        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);">
+                            <p><strong>${req.username}</strong></p>
+                            <p style="font-size:12px; opacity:0.7; margin-top:5px;">Reason: ${req.reason || 'No reason provided'}</p>
+                            <p style="font-size:12px; opacity:0.7;">Requested: ${new Date(req.created_at).toLocaleString()}</p>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button onclick="approveSettingsAccess(${req.id})" style="flex:1; padding:8px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer;">✓ Approve</button>
+                                <button onclick="denySettingsAccess(${req.id})" style="flex:1; padding:8px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer;">✕ Deny</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No pending access requests</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load settings access requests:', error);
+                document.getElementById('settings-requests-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load requests</p>';
+            }
+        }
+
+        async function approveSettingsAccess(requestId) {
+            if (!confirm('Approve settings access for this DJ?')) return;
+
+            try {
+                const res = await fetch('/api/settings/access-requests/approve', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ request_id: requestId })
+                });
+
+                if (res.ok) {
+                    alert('✓ Settings access granted!');
+                    await loadSettingsAccessRequests();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to approve request');
+                }
+            } catch (error) {
+                console.error('Approve failed:', error);
+                alert('Failed to approve request');
+            }
+        }
+
+        async function denySettingsAccess(requestId) {
+            if (!confirm('Deny settings access for this DJ?')) return;
+
+            try {
+                const res = await fetch('/api/settings/access-requests/deny', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ request_id: requestId })
+                });
+
+                if (res.ok) {
+                    alert('✓ Access request denied');
+                    await loadSettingsAccessRequests();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to deny request');
+                }
+            } catch (error) {
+                console.error('Deny failed:', error);
+                alert('Failed to deny request');
+            }
+        }
+
+        // ============= CLIENT MANAGEMENT =============
+
+        async function switchClientSubTab(subtab) {
+            // Update subtab buttons
+            document.getElementById('subtab-connected').style.background = '#666';
+            document.getElementById('subtab-banned').style.background = '#666';
+            document.getElementById('subtab-actions').style.background = '#666';
+            
+            document.getElementById('clients-connected-content').classList.add('hidden');
+            document.getElementById('clients-banned-content').classList.add('hidden');
+            document.getElementById('clients-actions-content').classList.add('hidden');
+            
+            if (subtab === 'connected') {
+                document.getElementById('subtab-connected').style.background = '#28a745';
+                document.getElementById('clients-connected-content').classList.remove('hidden');
+                await loadConnectedClients();
+            } else if (subtab === 'banned') {
+                document.getElementById('subtab-banned').style.background = '#28a745';
+                document.getElementById('clients-banned-content').classList.remove('hidden');
+                await loadBannedClients();
+            } else if (subtab === 'actions') {
+                document.getElementById('subtab-actions').style.background = '#28a745';
+                document.getElementById('clients-actions-content').classList.remove('hidden');
+                await loadClientActions();
+            }
+        }
+
+        async function loadConnectedClients() {
+            const listEl = document.getElementById('connected-clients-list');
+            if (!listEl) return;
+            listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">Loading connected clients...</p>'; // Show loading
+
+            try {
+                const res = await fetch('/api/clients/connected', {
+                    // Ensure 'token' is available globally
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                
+                if (!res.ok) throw new Error(`Status ${res.status}: Failed to load clients.`);
+                
+                const data = await res.json();
+
+                const clientsArray = data.connected;
+
+                if (data.success && Array.isArray(clientsArray) && clientsArray.length > 0) {
+                    listEl.innerHTML = clientsArray.map(client => {
+                        // Handle missing 'role' gracefully (set to 'UNKNOWN' or similar default)
+                        const clientRole = client.role ? client.role.toUpperCase() : 'UNKNOWN';
+                        
+                        // Handle potentially empty connected_at time
+                        const connectedTime = client.connected_at ? new Date(client.connected_at).toLocaleString() : 'N/A';
+                        
+                        return `
+                        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; border-left:3px solid #28a745;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <p style="font-weight:bold;">${client.username}</p>
+                                    <p style="font-size:12px; opacity:0.7;">Role: ${clientRole}</p>
+                                    <p style="font-size:12px; opacity:0.7;">Connected: ${connectedTime}</p>
+                                </div>
+                                <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                                    <button onclick="banClient('${client.username}')" style="padding:6px 12px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">🚫 Ban</button>
+                                    <button onclick="muteClient('${client.username}')" style="padding:6px 12px; background:#FF9800; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">🔇 Mute</button>
+                                    <button onclick="kickClient('${client.username}')" style="padding:6px 12px; background:#666; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">👢 Kick</button>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                } else {
+                    listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No connected clients</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load connected clients:', error);
+                listEl.innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load clients</p>';
+            }
+        }
+
+        async function loadBannedClients() {
+            try {
+                const res = await fetch('/api/clients/banned', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const listEl = document.getElementById('banned-clients-list');
+                if (data.success && data.banned && data.banned.length > 0) {
+                    listEl.innerHTML = data.banned.map(ban => `
+                        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; border-left:3px solid #f44336;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <p style="font-weight:bold;">${ban.username}</p>
+                                    <p style="font-size:12px; opacity:0.7;">Reason: ${ban.reason || 'No reason'}</p>
+                                    <p style="font-size:12px; opacity:0.7;">Banned by: ${ban.admin}</p>
+                                    <p style="font-size:12px; opacity:0.7;">Date: ${new Date(ban.created_at).toLocaleString()}</p>
+                                </div>
+                                <button onclick="unbanClient('${ban.username}')" style="padding:8px 15px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer;">✓ Unban</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No banned clients</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load banned clients:', error);
+                document.getElementById('banned-clients-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load banned clients</p>';
+            }
+        }
+
+        async function loadClientActions() {
+            try {
+                const res = await fetch('/api/clients/actions', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                const listEl = document.getElementById('client-actions-list');
+                if (data.success && data.actions && data.actions.length > 0) {
+                    listEl.innerHTML = data.actions.map(action => {
+                        const colors = {
+                            'ban': '#f44336',
+                            'unban': '#4CAF50',
+                            'mute': '#FF9800',
+                            'kick': '#666'
+                        };
+                        return `
+                            <div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:8px; border-radius:6px; border-left:3px solid ${colors[action.action] || '#666'};">
+                                <p style="font-weight:bold; margin:2px 0;">${action.action.toUpperCase()}: ${action.username}</p>
+                                <p style="font-size:11px; opacity:0.7; margin:2px 0;">Reason: ${action.reason || 'N/A'}</p>
+                                <p style="font-size:11px; opacity:0.7; margin:2px 0;">By: ${action.admin} | ${new Date(action.created_at).toLocaleString()}</p>
+                                <p style="font-size:11px; opacity:0.7; margin:2px 0;">Status: ${action.is_active ? '🟢 Active' : '⚫ Inactive'}</p>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    listEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No actions recorded</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load client actions:', error);
+                document.getElementById('client-actions-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load actions</p>';
+            }
+        }
+
+        async function banClient(username) {
+            const reason = prompt(`Enter reason for banning "${username}":`);
+            if (reason === null) return;
+
+            try {
+                const res = await fetch('/api/clients/ban', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username, reason: reason })
+                });
+
+                if (res.ok) {
+                    alert(`✓ User "${username}" has been banned`);
+                    await switchClientSubTab('connected');
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to ban user');
+                }
+            } catch (error) {
+                console.error('Ban failed:', error);
+                alert('Failed to ban user');
+            }
+        }
+
+        async function unbanClient(username) {
+            if (!confirm(`Unban user "${username}"?`)) return;
+
+            try {
+                const res = await fetch('/api/clients/unban', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username })
+                });
+
+                if (res.ok) {
+                    alert(`✓ User "${username}" has been unbanned`);
+                    await loadBannedClients();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to unban user');
+                }
+            } catch (error) {
+                console.error('Unban failed:', error);
+                alert('Failed to unban user');
+            }
+        }
+
+        async function muteClient(username) {
+            // 1. Get the reason
+            const reason = prompt(`Enter reason for muting "${username}":`);
+            if (reason === null || reason.trim() === '') {
+                alert("Mute canceled: Reason is required.");
+                return;
+            }
+
+            // Define preset duration options
+            const durationOptions = [
+                "5m", "15m", "1h", "1d", "1w", "none" // 'none' for permanent
+            ];
+            const durationPrompt = (
+                `Enter mute duration for "${username}".\n\n` +
+                `Options: ${durationOptions.join(', ')} (e.g., 1h or 15m)\n` +
+                `Enter 'none' for permanent mute.`
+            );
+
+            // 2. Get the duration
+            let duration = prompt(durationPrompt);
+            
+            if (duration === null) return; // Mute canceled
+
+            duration = duration.trim().toLowerCase();
+            
+            // 3. Validate duration input
+            if (!durationOptions.includes(duration)) {
+                alert("Mute canceled: Invalid duration entered. Please use one of the listed options.");
+                return;
+            }
+            
+            // 4. Determine expiry (The backend will typically parse this string: "5m", "1h", etc.)
+            const expiry_duration = (duration === 'none' || duration === 'permanent') ? null : duration;
+
+
+            try {
+                const res = await fetch('/api/clients/mute', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    // 5. Send both username, reason, and duration to the backend
+                    body: JSON.stringify({ 
+                        username: username, 
+                        reason: reason, 
+                        duration: expiry_duration // Backend expects a string like '1h' or null
+                    })
+                });
+
+                if (res.ok) {
+                    const durationText = expiry_duration ? `for ${expiry_duration}` : 'permanently';
+                    alert(`✓ User "${username}" has been muted ${durationText}.`);
+                    loadConnectedClients(); // Refresh the client list
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to mute user');
+                }
+            } catch (error) {
+                console.error('Mute failed:', error);
+                alert('Failed to mute user due to a network error.');
+            }
+        }
+
+        async function kickClient(username) {
+            const reason = prompt(`Enter reason for kicking "${username}":`);
+            if (reason === null) return;
+
+            try {
+                const res = await fetch('/api/clients/kick', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username, reason: reason })
+                });
+
+                if (res.ok) {
+                    alert(`✓ User "${username}" has been kicked`);
+                    await switchClientSubTab('connected');
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to kick user');
+                }
+            } catch (error) {
+                console.error('Kick failed:', error);
+                alert('Failed to kick user');
+            }
+        }
+
+        // ============= PROMOTIONS FUNCTIONS =============
+
+        async function loadPromotions() {
+            try {
+                const res = await fetch('/api/promotions', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    // Display active promotions
+                    const activeEl = document.getElementById('active-promotions-list');
+                    if (data.active && data.active.length > 0) {
+                        activeEl.innerHTML = data.active.map(promo => `
+                            <div style="background:rgba(76,175,80,0.1); padding:15px; margin-bottom:10px; border-radius:8px; border-left:3px solid #4CAF50;">
+                                <div style="display:flex; justify-content:space-between; align-items:start;">
+                                    <div style="flex:1;">
+                                        <p style="font-weight:bold; font-size:15px; margin:0;">🎤 ${promo.name}</p>
+                                        <p style="font-size:13px; opacity:0.8; margin:5px 0;">${promo.description}</p>
+                                        <p style="font-size:12px; opacity:0.7; margin:3px 0;">👤 Promoter: ${promo.promoter}</p>
+                                        <p style="font-size:12px; opacity:0.7; margin:3px 0;">📅 ${new Date(promo.from_datetime).toLocaleString()} → ${new Date(promo.to_datetime).toLocaleString()}</p>
+                                        <p style="font-size:12px; opacity:0.7; margin:3px 0;">📊 Played: ${promo.play_count || 0} times</p>
+                                    </div>
+                                    ${currentUser && currentUser.role === 'admin' ? `
+                                    <button onclick="deletePromotion('${promo.id}')" style="padding:8px 12px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer;">🗑️ Delete</button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        activeEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No active promotions</p>';
+                    }
+
+                    // Display all promotions
+                    const allEl = document.getElementById('all-promotions-list');
+                    if (data.all && data.all.length > 0) {
+                        allEl.innerHTML = data.all.map(promo => {
+                            const now = new Date();
+                            const from = new Date(promo.from_datetime);
+                            const to = new Date(promo.to_datetime);
+                            const isActive = from <= now && now <= to;
+                            const isPending = from > now;
+                            const isExpired = to < now;
+                            
+                            let statusColor = '#666';
+                            let statusText = '⚫ Expired';
+                            if (isActive) {
+                                statusColor = '#4CAF50';
+                                statusText = '🟢 Active';
+                            } else if (isPending) {
+                                statusColor = '#FF9800';
+                                statusText = '⏳ Pending';
+                            }
+                            
+                            return `
+                                <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; border-left:3px solid ${statusColor};">
+                                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                                        <div style="flex:1;">
+                                            <p style="font-weight:bold; margin:0;">${promo.name} <span style="font-size:12px; color:${statusColor};">${statusText}</span></p>
+                                            <p style="font-size:12px; opacity:0.8; margin:5px 0;">${promo.description}</p>
+                                            <p style="font-size:11px; opacity:0.7; margin:3px 0;">Promoter: ${promo.promoter}</p>
+                                            <p style="font-size:11px; opacity:0.7; margin:3px 0;">From: ${new Date(promo.from_datetime).toLocaleString()}</p>
+                                            <p style="font-size:11px; opacity:0.7; margin:3px 0;">To: ${new Date(promo.to_datetime).toLocaleString()}</p>
+                                            <p style="font-size:11px; opacity:0.7; margin:3px 0;">Played: ${promo.play_count || 0} times</p>
+                                        </div>
+                                        ${currentUser && currentUser.role === 'admin' ? `
+                                        <button onclick="deletePromotion('${promo.id}')" style="padding:6px 10px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">🗑️ Delete</button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        allEl.innerHTML = '<p style="text-align:center; opacity:0.6;">No promotions</p>';
+                    }
+                } else {
+                    document.getElementById('active-promotions-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load promotions</p>';
+                    document.getElementById('all-promotions-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load promotions</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load promotions:', error);
+                document.getElementById('active-promotions-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load promotions</p>';
+                document.getElementById('all-promotions-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load promotions</p>';
+            }
+        }
+
+        async function uploadPromotion(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('promo-name').value;
+            const promoter = document.getElementById('promo-promoter').value;
+            const description = document.getElementById('promo-description').value;
+            const fromDatetime = document.getElementById('promo-from').value;
+            const toDatetime = document.getElementById('promo-to').value;
+            const audioFile = document.getElementById('promo-audio').files[0];
+            
+            if (!audioFile) {
+                document.getElementById('promo-upload-msg').innerHTML = '<span style="color:#ff5757;">Please select an audio file</span>';
+                return;
+            }
+            
+            // Validate datetime
+            const from = new Date(fromDatetime);
+            const to = new Date(toDatetime);
+            if (to <= from) {
+                document.getElementById('promo-upload-msg').innerHTML = '<span style="color:#ff5757;">End date must be after start date</span>';
+                return;
+            }
+            
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('promoter', promoter);
+            formData.append('description', description);
+            formData.append('from_datetime', from.toISOString());
+            formData.append('to_datetime', to.toISOString());
+            formData.append('audio_file', audioFile);
+            
+            document.getElementById('promo-upload-msg').innerHTML = '<span style="color:#4CAF50;">Uploading...</span>';
+            
+            try {
+                const res = await fetch('/api/promotions/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    document.getElementById('promo-upload-msg').innerHTML = '<span style="color:#4CAF50;">✓ Promotion uploaded successfully!</span>';
+                    document.getElementById('promo-upload-form').reset();
+                    
+                    // Reload promotions list
+                    await loadPromotions();
+                    
+                    setTimeout(() => {
+                        document.getElementById('promo-upload-msg').innerHTML = '';
+                    }, 3000);
+                } else {
+                    document.getElementById('promo-upload-msg').innerHTML = `<span style="color:#ff5757;">✕ ${data.error || 'Upload failed'}</span>`;
+                }
+            } catch (error) {
+                console.error('Upload failed:', error);
+                document.getElementById('promo-upload-msg').innerHTML = '<span style="color:#ff5757;">✕ Upload failed</span>';
+            }
+        }
+
+        async function deletePromotion(promoId) {
+            if (!confirm('Delete this promotion? This action cannot be undone.')) return;
+            
+            try {
+                const res = await fetch(`/api/promotions/${promoId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (res.ok) {
+                    alert('✓ Promotion deleted successfully');
+                    await loadPromotions();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to delete promotion');
+                }
+            } catch (error) {
+                console.error('Delete failed:', error);
+                alert('Failed to delete promotion');
+            }
+        }
+
+        // Profile Management Functions
+        function openChangeUsername() {
+            document.getElementById('change-username-modal').classList.remove('hidden');
+            document.getElementById('new-username-input').value = '';
+            document.getElementById('change-username-msg').textContent = '';
+        }
+
+        function closeChangeUsername() {
+            document.getElementById('change-username-modal').classList.add('hidden');
+        }
+
+        async function submitChangeUsername() {
+            const newUsername = document.getElementById('new-username-input').value.trim();
+            const msgEl = document.getElementById('change-username-msg');
+
+            if (!newUsername) {
+                msgEl.textContent = 'Please enter a username';
+                msgEl.style.color = '#ff5757';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/profile/change-username', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ new_username: newUsername })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    msgEl.textContent = '✓ Username updated! Please login again.';
+                    msgEl.style.color = '#4CAF50';
+                    setTimeout(() => {
+                        handleLogout();
+                    }, 2000);
+                } else {
+                    msgEl.textContent = data.error || 'Failed to update username';
+                    msgEl.style.color = '#ff5757';
+                }
+            } catch (error) {
+                console.error('Change username failed:', error);
+                msgEl.textContent = 'Failed to update username';
+                msgEl.style.color = '#ff5757';
+            }
+        }
+
+        function openChangePassword() {
+            document.getElementById('change-password-modal').classList.remove('hidden');
+            document.getElementById('current-password-input').value = '';
+            document.getElementById('new-password-input').value = '';
+            document.getElementById('change-password-msg').textContent = '';
+        }
+
+        function closeChangePassword() {
+            document.getElementById('change-password-modal').classList.add('hidden');
+        }
+
+        async function submitChangePassword() {
+            const currentPassword = document.getElementById('current-password-input').value;
+            const newPassword = document.getElementById('new-password-input').value;
+            const msgEl = document.getElementById('change-password-msg');
+
+            if (!currentPassword || !newPassword) {
+                msgEl.textContent = 'Please fill in both fields';
+                msgEl.style.color = '#ff5757';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/profile/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        current_password: currentPassword,
+                        new_password: newPassword 
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    msgEl.textContent = '✓ Password updated! Please login again.';
+                    msgEl.style.color = '#4CAF50';
+                    setTimeout(() => {
+                        handleLogout();
+                    }, 2000);
+                } else {
+                    msgEl.textContent = data.error || 'Failed to update password';
+                    msgEl.style.color = '#ff5757';
+                }
+            } catch (error) {
+                console.error('Change password failed:', error);
+                msgEl.textContent = 'Failed to update password';
+                msgEl.style.color = '#ff5757';
+            }
+        }
+
+        async function regenerateApiKey() {
+            if (!confirm('Are you sure you want to regenerate your API key? The old key will stop working.')) return;
+
+            try {
+                const res = await fetch('/api/profile/regenerate-api-key', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    currentUser.api_key = data.api_key;
+                    document.getElementById('profile-api-key').value = data.api_key;
+                    alert('✓ API key regenerated!');
+                } else {
+                    alert(data.error || 'Failed to regenerate API key');
+                }
+            } catch (error) {
+                console.error('Regenerate API key failed:', error);
+                alert('Failed to regenerate API key');
+            }
+        }
+
+        async function requestDJRole() {
+            if (!confirm('Request DJ role? Admins will review your request.')) return;
+
+            try {
+                const res = await fetch('/api/role-requests', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert('✓ DJ role request submitted! Admins will review it.');
+                    document.getElementById('request-dj-btn').classList.add('hidden');
+                } else {
+                    alert(data.error || 'Failed to submit request');
+                }
+            } catch (error) {
+                console.error('Request DJ role failed:', error);
+                alert('Failed to submit request');
+            }
+        }
+
+        async function requestApiKey() {
+            if (!confirm('Request API key access? Admins will review your request.')) return;
+
+            try {
+                const res = await fetch('/api/api-key-requests', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert('✓ API key request submitted! Admins will review it.');
+                    document.getElementById('request-api-key-btn').classList.add('hidden');
+                } else {
+                    alert(data.error || 'Failed to submit request');
+                }
+            } catch (error) {
+                console.error('Request API key failed:', error);
+                alert('Failed to submit request');
+            }
+        }
+
+        async function requestSettingsAccess() {
+            if (!confirm('Request settings panel access? Admins will review your request.')) return;
+
+            try {
+                const res = await fetch('/api/settings/request-access', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason: '' })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    alert('✓ Settings access request submitted! Admins will review it.');
+                    document.getElementById('request-settings-btn').classList.add('hidden');
+                } else {
+                    alert(data.message || data.error || 'Failed to submit request');
+                }
+            } catch (error) {
+                console.error('Request settings access failed:', error);
+                alert('Failed to submit request');
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/users', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.users) {
+                    displayUsers(data.users);
+                } else {
+                    document.getElementById('users-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Failed to load users</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load users:', error);
+                document.getElementById('users-list').innerHTML = '<p style="text-align:center; color:#ff5757;">Error loading users</p>';
+            }
+        }
+
+        function displayUsers(users) {
+            const usersList = document.getElementById('users-list');
+            if (!users || users.length === 0) {
+                usersList.innerHTML = '<p style="text-align:center; opacity:0.6;">No users found</p>';
+                return;
+            }
+
+            usersList.innerHTML = users.map(user => `
+                <div style="background:rgba(255,255,255,0.05); padding:15px; margin:10px 0; border-radius:10px; border-left:4px solid #007BFF;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div>
+                            <p style="margin:2px 0; font-size:16px; font-weight:bold;">${user.username}</p>
+                            <p style="margin:2px 0; font-size:12px; opacity:0.7;">${user.email}</p>
+                            <p style="margin:2px 0; font-size:12px;">
+                                <span class="role-badge role-${user.role}">${user.role.toUpperCase()}</span>
+                            </p>
+                        </div>
+                        ${user.id != currentUser.id ? `
+                        <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                            ${user.role !== 'admin' ? `<button onclick="updateUserRole('${user.id}', 'admin')" style="padding:6px 12px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">Make Admin</button>` : ''}
+                            ${user.role !== 'dj' ? `<button onclick="updateUserRole('${user.id}', 'dj')" style="padding:6px 12px; background:#ff9800; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">Make DJ</button>` : ''}
+                            ${user.role !== 'user' ? `<button onclick="updateUserRole('${user.id}', 'user')" style="padding:6px 12px; background:#2196F3; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">Make User</button>` : ''}
+                            <button onclick="resetUserPassword('${user.id}', '${user.username}')" style="padding:6px 12px; background:#9C27B0; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">Reset Password</button>
+                            <button onclick="regenerateUserApiKey('${user.id}', '${user.username}')" style="padding:6px 12px; background:#FF5722; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">Regenerate API Key</button>
+                            <button onclick="deleteUserAccount('${user.id}', '${user.username}')" style="padding:6px 12px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">Delete</button>
+                        </div>
+                        ` : '<span style="opacity:0.6; font-size:12px;">(Your account)</span>'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function updateUserRole(userId, newRole) {
+            if (!confirm(`Change this user's role to ${newRole.toUpperCase()}?`)) return;
+
+            try {
+                const res = await fetch('/api/users/role', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: userId, new_role: newRole })
+                });
+
+                if (res.ok) {
+                    alert('✓ Role updated successfully!');
+                    await loadUsers();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to update role');
+                }
+            } catch (error) {
+                console.error('Failed to update role:', error);
+                alert('Failed to update role');
+            }
+        }
+
+        async function deleteUserAccount(userId, username) {
+            if (!confirm(`Are you sure you want to DELETE user "${username}"? This cannot be undone!`)) return;
+
+            try {
+                const res = await fetch('/api/users/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                if (res.ok) {
+                    alert('✓ User deleted successfully!');
+                    await loadUsers();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to delete user');
+                }
+            } catch (error) {
+                console.error('Failed to delete user:', error);
+                alert('Failed to delete user');
+            }
+        }
+
+        async function resetUserPassword(userId, username) {
+            const newPassword = prompt(`Enter new password for "${username}":`);
+            if (!newPassword || newPassword.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/users/password', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: userId, new_password: newPassword })
+                });
+
+                if (res.ok) {
+                    alert('✓ Password reset successfully!');
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to reset password');
+                }
+            } catch (error) {
+                console.error('Failed to reset password:', error);
+                alert('Failed to reset password');
+            }
+        }
+
+        async function regenerateUserApiKey(userId, username) {
+            if (!confirm(`Regenerate API key for "${username}"? Their old API key will stop working.`)) return;
+
+            try {
+                const res = await fetch('/api/users/regenerate-key', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    alert(`✓ New API Key: ${data.new_api_key}\n\nMake sure to save this, it won't be shown again!`);
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to regenerate API key');
+                }
+            } catch (error) {
+                console.error('Failed to regenerate API key:', error);
+                alert('Failed to regenerate API key');
+            }
+        }
+
+        async function loadInitialData() {
+            // Load queue
+            try {
+                const queueRes = await fetch('/api/queue');
+                const queueData = await queueRes.json();
+                if (queueData.queue) {
+                    updateQueue(queueData.queue);
+                }
+            } catch (error) {
+                console.error('Failed to load queue:', error);
+            }
+
+            // Load next coming
+            try {
+                const nextRes = await fetch('/api/next-coming');
+                const nextData = await nextRes.json();
+                updateNextComing(nextData);
+            } catch (error) {
+                console.error('Failed to load next coming:', error);
+            }
+        }
+
+        function connectWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws`);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                ws.send(JSON.stringify({ token: token }));
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message:', data);
+
+                if (data.action === 'auth_success') {
+                    document.getElementById('ws-status').textContent = '🟢 Live';
+                    document.getElementById('ws-status').className = 'ws-status connected';
+                } else if (data.action === 'now_playing') {
+                    updateNowPlaying(data.data);
+                } else if (data.action === 'next_coming') {
+                    updateNextComing(data.data);
+                } else if (data.action === 'queue') {
+                    updateQueue(data.data);
+                } else if (data.action === 'listeners' && data.type === 'notification') {
+                    handleListenersUpdate(data.data);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                document.getElementById('ws-status').textContent = '⚫ Error';
+                document.getElementById('ws-status').className = 'ws-status disconnected';
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                document.getElementById('ws-status').textContent = '⚫ Disconnected';
+                document.getElementById('ws-status').className = 'ws-status disconnected';
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function handleListenersUpdate(data) {
+            const countEl = document.getElementById('listener-count');
+            if (!countEl) return;
+
+            const newCount = data?.listeners ?? "0";
+            const currentCount = countEl.textContent;
+
+            if (currentCount !== String(newCount)) {
+                // Optional: Add a smooth count animation
+                animateCountChange(countEl, parseInt(currentCount) || 0, parseInt(newCount));
+            }
+        }
+
+        function animateCountChange(element, start, end) {
+            const duration = 400;
+            const stepTime = 30;
+            const steps = duration / stepTime;
+            let step = 0;
+
+            const diff = end - start;
+            const interval = setInterval(() => {
+                step++;
+                const value = Math.round(start + (diff * step / steps));
+                element.textContent = value;
+                if (step >= steps) clearInterval(interval);
+            }, stepTime);
+
+            // Optional highlight flash
+            element.style.transition = "color 0.3s";
+            element.style.color = "#ffffff";
+            setTimeout(() => element.style.color = "", 500);
+        }
+
+        function updateNowPlaying(song) {
+            const titleEl = document.getElementById('np-title');
+            const artistEl = document.getElementById('np-artist');
+            const albumEl = document.getElementById('np-album');
+            const requesterEl = document.getElementById('np-requester');
+            const albumArtEl = document.getElementById('np-albumart');
+
+            titleEl.textContent = song.title || 'N/A';
+            artistEl.textContent = '🎤 ' + (song.artist || 'N/A');
+            albumEl.textContent = '📀 ' + (song.album || 'N/A');
+            requesterEl.textContent = song.requester ? `👤 Requested by ${song.requester}` : '';
+
+            // Start ticking timer if data available
+            if (song.position !== undefined && song.durationsec !== undefined) {
+                startSongTimer(parseInt(song.position), parseInt(song.durationsec));
+            }
+
+            if (song.albumart) {
+                albumArtEl.classList.remove('show');
+                albumArtEl.style.transition = "opacity 0.5s ease";
+                albumArtEl.style.opacity = 0;
+                setTimeout(() => {
+                    albumArtEl.src = song.albumart;
+                    document.body.style.backgroundImage = `url(${song.albumart})`;
+                    albumArtEl.style.opacity = 1;
+                }, 300);
+            }
+
+            // Animate text changes
+            [titleEl, artistEl, albumEl, requesterEl].forEach(animateElement);
+        }
+
+        function updateNextComing(data) {
+            const detailsEl = document.getElementById('next-song-details');
+            let nextSong = null;
+
+            if (data && data.next_coming !== undefined) {
+                if (Array.isArray(data.next_coming) && data.next_coming.length > 0)
+                    nextSong = data.next_coming[0];
+                else nextSong = data.next_coming;
+            } else nextSong = data;
+
+            if (nextSong && nextSong.title) {
+                detailsEl.innerHTML = `
+                    <div class="fade-scale">
+                        <p><strong>${nextSong.title}</strong></p>
+                        <p>🎤 ${nextSong.artist || nextSong.artists || 'N/A'}</p>
+                        <p>📀 ${nextSong.album || 'N/A'}</p>
+                        ${nextSong.requester ? `<p>👤 Requested by ${nextSong.requester}</p>` : ''}
+                    </div>
+                `;
+            } else {
+                detailsEl.innerHTML = `<p class="fade-scale">No upcoming song</p>`;
+            }
+
+            animateElement(detailsEl.querySelector('.fade-scale'));
+        }
+
+        function updateQueue(queue) {
+            const listEl = document.getElementById('request-list');
+            if (!queue || queue.length === 0) {
+                listEl.innerHTML = '<p class="fade-scale">No songs in queue</p>';
+                animateElement(listEl.querySelector('.fade-scale'));
+                return;
+            }
+
+            listEl.innerHTML = queue.map(song => {
+                const canRemove = currentUser && (currentUser.role === 'admin' || currentUser.role === 'dj' || song.requester === currentUser.username);
+                const canMoveTop = currentUser && (currentUser.role === 'admin' || currentUser.role === 'dj');
+                
+                return `
+                    <div class="queue-item fade-scale" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <p><strong>${song.title}</strong></p>
+                            <p>🎤 ${song.artist}</p>
+                            <p>👤 ${song.requester}</p>
+                        </div>
+                        <div style="display:flex; gap:5px;">
+                            ${canMoveTop ? `<button onclick="moveToTop(${song.id})" style="padding:6px 10px; background:#FF9800; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">↑ Top</button>` : ''}
+                            ${canRemove ? `<button onclick="removeRequest(${song.id})" style="padding:6px 10px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px;">✕ Remove</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Animate all new queue items
+            listEl.querySelectorAll('.queue-item').forEach((el, i) => {
+                setTimeout(() => animateElement(el), i * 60); // slight staggered animation
+            });
+        }
+
+        function animateElement(el) {
+            if (!el) return;
+            el.classList.remove('show');
+            void el.offsetWidth; // trigger reflow
+            el.classList.add('fade-scale');
+            setTimeout(() => el.classList.add('show'), 10);
+        }
+
+        let timerInterval = null;
+
+        function startSongTimer(positionSec, durationSec) {
+            const timerEl = document.getElementById('np-timer');
+            if (!timerEl) return;
+
+            // Clear any existing timer
+            if (timerInterval) clearInterval(timerInterval);
+
+            // Format seconds → MM:SS
+            function formatTime(sec) {
+                if (isNaN(sec) || sec < 0) sec = 0;
+                const m = Math.floor(sec / 60);
+                const s = Math.floor(sec % 60);
+                return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+
+            // Initial render
+            timerEl.textContent = `🕒 ${formatTime(positionSec)} / ${formatTime(durationSec)}`;
+
+            // Update every second
+            timerInterval = setInterval(() => {
+                positionSec++;
+                if (positionSec > durationSec) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                timerEl.textContent = `🕒 ${formatTime(positionSec)} / ${formatTime(durationSec)}`;
+            }, 1000);
+        }
+
+        async function removeRequest(requestId) {
+            if (!confirm('Remove this song from the queue?')) return;
+
+            try {
+                const res = await fetch(`/api/queue/remove/${requestId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    alert('✓ Song removed from queue!');
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to remove song');
+                }
+            } catch (error) {
+                console.error('Remove failed:', error);
+                alert('Failed to remove song');
+            }
+        }
+
+        async function moveToTop(requestId) {
+            if (!confirm('Move this song to the top of the queue?')) return;
+
+            try {
+                const res = await fetch(`/api/queue/move-top/${requestId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    alert('✓ Song moved to top!');
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to move song');
+                }
+            } catch (error) {
+                console.error('Move failed:', error);
+                alert('Failed to move song');
+            }
+        }
+
+        async function searchSongs() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+
+            try {
+                const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.results && data.results.length > 0) {
+                    displaySearchResults(data.results);
+                } else {
+                    document.getElementById('search-results').innerHTML = '<p style="text-align:center; opacity:0.6;">No results found</p>';
+                }
+            } catch (error) {
+                console.error('Search failed:', error);
+                document.getElementById('search-results').innerHTML = '<p style="text-align:center; color:#ff5757;">Search failed</p>';
+            }
+        }
+
+        // Store search results for request function
+        let searchResultsData = [];
+
+        function displaySearchResults(results) {
+            searchResultsData = results;
+            const resultsEl = document.getElementById('search-results');
+            resultsEl.innerHTML = results.map((song, index) => `
+                <div class="song-result">
+                    <img src="${song.albumart || 'https://via.placeholder.com/60'}" alt="Album art">
+                    <div class="song-result-info">
+                        <p><strong>${song.title}</strong></p>
+                        <p>🎤 ${song.artist}</p>
+                        <p>⏱️ ${song.duration || 'N/A'}</p>
+                    </div>
+                    <button onclick="requestSong(${index})">Request</button>
+                </div>
+            `).join('');
+        }
+
+        async function requestSong(songIndex) {
+            const song = searchResultsData[songIndex];
+            if (!song) {
+                alert('Song not found');
+                return;
+            }
+
+            // 1. 🔑 POPUP: Ask for the requester's name
+            const requesterInput = prompt(`Enter requester's name for "${song.title}" (Optional):`);
+            
+            // Check if the user pressed Cancel (null)
+            if (requesterInput === null) {
+                console.log("Song request cancelled by user.");
+                return;
+            }
+
+            // Sanitize and trim the input
+            const customRequester = requesterInput.trim();
+
+            // Capture YouTube URL from input field
+            const youtubeUrl = document.getElementById('youtube-url-input').value.trim();
+
+            try {
+                const requestBody = {
+                    track_id: song.id,
+                    title: song.title,
+                    artist: song.artist || '',
+                    album: song.album || '',
+                    duration: song.duration_ms ? Math.floor(song.duration_ms / 1000) : 0,
+                    album_art: song.album_art || ''
+                };
+
+                // 2. ⭐ CONDITIONAL PARSING: Only include 'requester_name' if the input is not empty
+                if (customRequester.length > 0) {
+                    requestBody.requester_name = customRequester;
+                    console.log(`Requesting song on behalf of: ${customRequester}`);
+                }
+
+                // Include YouTube URL if provided
+                if (youtubeUrl) {
+                    requestBody.youtube_url = youtubeUrl;
+                }
+
+                const res = await fetch('/api/play', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                // 3. Error Handling (Including Mute Check from previous step)
+                if (!res.ok) {
+                    const data = await res.json();
+                    
+                    // Check for 403 status or specific error messages (e.g., mute check)
+                    if (res.status === 403 || data.error.includes("Access denied")) {
+                        alert(`🚫 Access Denied: ${data.error || 'You are currently muted and cannot request songs.'}`);
+                    } else {
+                        alert(data.error || 'Failed to request song');
+                    }
+                    return;
+                }
+                
+                // Success Path
+                const data = await res.json();
+                alert(`✓ "${song.title}" added to queue!`);
+                // Clear YouTube URL input after successful request
+                document.getElementById('youtube-url-input').value = '';
+
+            } catch (error) {
+                console.error('Request failed:', error);
+                alert('Failed to request song due to a network error.');
+            }
+        }
+
+        async function requestFromYouTube() {
+            const youtubeUrl = document.getElementById('youtube-url-input').value.trim();
+            
+            if (!youtubeUrl) {
+                alert('Please paste a YouTube URL first');
+                return;
+            }
+
+            // Validate YouTube URL format
+            if (!youtubeUrl.includes('youtube.com') && !youtubeUrl.includes('youtu.be')) {
+                alert('Please enter a valid YouTube URL');
+                return;
+            }
+
+            const requesterInput = prompt(`Enter requester's name for this YouTube request (Optional):`);
+            
+            if (requesterInput === null) {
+                console.log("YouTube request cancelled by user.");
+                return;
+            }
+
+            const customRequester = requesterInput.trim();
+
+        try {
+                const requestBody = { 
+                    youtube_url: youtubeUrl 
+                };
+
+                if (customRequester.length > 0) {
+                    requestBody.requester_name = customRequester;
+                }
+
+                const res = await fetch('/api/play-youtube', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert(`✓ "${data.title}" added to queue!`);
+                    document.getElementById('youtube-url-input').value = '';
+                } else {
+                    // 🚫 Handle Mute or Access Denied error (403 status is likely)
+                    if (res.status === 403 || data.error.includes("Access denied")) {
+                        alert(`🚫 Access Denied: ${data.error || 'You are currently muted and cannot request songs.'}`);
+                    } else {
+                        alert(data.error || 'Failed to request song from YouTube');
+                    }
+                }
+            } catch (error) {
+                console.error('YouTube request failed:', error);
+                alert('Failed to request song from YouTube');
+            }
+        }
+
+        async function skipSong() {
+            // Assume 'token' is available globally
+            if (!confirm('Are you sure you want to skip this song?')) return;
+
+            try {
+                const res = await fetch('/api/skip', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    alert('✓ Song skipped!');
+                } else {
+                    // Check for 403 status or specific error messages
+                    const data = await res.json();
+                    
+                    // Look for the specific mute message or unauthorized access
+                    if (res.status === 403 || data.error.includes("Access denied")) {
+                        alert(`🚫 Access Denied: ${data.error || 'You do not have permission to perform this action.'}`);
+                    } else {
+                        alert('Failed to skip song: ' + (data.error || 'Unknown reason.'));
+                    }
+                }
+            } catch (error) {
+                console.error('Skip failed:', error);
+                alert('Failed to skip song due to a network error.');
+            }
+        }
+
+        async function loadPlaylists() {
+            try {
+                const res = await fetch('/api/playlists', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.playlists) {
+                    displayPlaylists(data.playlists);
+                }
+            } catch (error) {
+                console.error('Failed to load playlists:', error);
+            }
+        }
+
+        function displayPlaylists(playlists) {
+            const container = document.getElementById('playlists-container');
+            if (!playlists || playlists.length === 0) {
+                container.innerHTML = '<p style="opacity:0.6;">No playlists added</p>';
+                return;
+            }
+
+            container.innerHTML = playlists.map((playlist, index) => `
+                <div class="playlist-item">
+                    <span>${playlist}</span>
+                    <button onclick="deletePlaylist(${index})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        async function addPlaylist() {
+            const url = document.getElementById('playlist-url').value.trim();
+            if (!url) {
+                alert('Please enter a playlist URL');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/playlists', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ playlist_url: url })
+                });
+
+                if (res.ok) {
+                    alert('✓ Playlist added!');
+                    document.getElementById('playlist-url').value = '';
+                    loadPlaylists();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to add playlist');
+                }
+            } catch (error) {
+                console.error('Failed to add playlist:', error);
+                alert('Failed to add playlist');
+            }
+        }
+
+        async function deletePlaylist(index) {
+            if (!confirm('Delete this playlist?')) return;
+
+            try {
+                const res = await fetch(`/api/playlists/${index}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    alert('✓ Playlist deleted!');
+                    loadPlaylists();
+                } else {
+                    alert('Failed to delete playlist');
+                }
+            } catch (error) {
+                console.error('Failed to delete playlist:', error);
+                alert('Failed to delete playlist');
+            }
+        }
+
+        // Call the function when the HTML document is ready
+        document.addEventListener('DOMContentLoaded', checkUrlForVerificationStatus);
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profile-menu');
+            const profileButton = document.getElementById('profile-button');
+            
+            if (!profileMenu.contains(event.target) && event.target !== profileButton) {
+                profileMenu.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
