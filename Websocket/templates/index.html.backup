@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pew Hits Radio - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        /* Login/Signup Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .btn-danger {
+            background: #f44336;
+            color: white;
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        .error {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .success {
+            color: #4CAF50;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .link-text {
+            text-align: center;
+            margin-top: 15px;
+            color: #667eea;
+            cursor: pointer;
+        }
+        
+        /* User Info Bar */
+        .user-bar {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .role-admin {
+            background: #f44336;
+        }
+        .role-dj {
+            background: #ff9800;
+        }
+        .role-user {
+            background: #4CAF50;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .card h2 {
+            margin-bottom: 15px;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .song-info {
+            margin: 10px 0;
+        }
+        .song-info strong {
+            color: #764ba2;
+        }
+        .album-art {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .status.live {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.offline {
+            background: #f44336;
+            color: white;
+        }
+        .queue-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .hidden {
+            display: none;
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Modal -->
+        <div id="loginModal" class="modal active">
+            <div class="modal-content">
+                <h2 id="modalTitle">Login to Pew Hits Radio</h2>
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter password">
+                    </div>
+                    <div id="loginError" class="error"></div>
+                    <button class="btn btn-primary" onclick="handleLogin()">Login</button>
+                    <div class="link-text" onclick="showSignup()">Don't have an account? Sign up</div>
+                </div>
+                
+                <div id="signupForm" class="hidden">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="signupUsername" placeholder="Choose username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="signupPassword" placeholder="Choose password">
+                    </div>
+                    <div id="signupError" class="error"></div>
+                    <button class="btn btn-primary" onclick="handleSignup()">Sign Up</button>
+                    <div class="link-text" onclick="showLogin()">Already have an account? Login</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Info Bar -->
+        <div id="userBar" class="user-bar hidden">
+            <div class="user-info">
+                <span>Welcome, <strong id="username"></strong></span>
+                <span id="roleBadge" class="role-badge"></span>
+                <span id="wsStatus" class="status offline">⚫ Connecting...</span>
+            </div>
+            <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
+        </div>
+        
+        <div class="header">
+            <h1>🎵 Pew Hits Radio</h1>
+            <p>Your 24/7 Music Stream</p>
+        </div>
+        
+        <div id="dashboard" class="dashboard hidden">
+            <div class="card">
+                <h2>Now Playing</h2>
+                <div id="now-playing">
+                    <div class="song-info"><strong>Title:</strong> <span id="np-title">Loading...</span></div>
+                    <div class="song-info"><strong>Artist:</strong> <span id="np-artist">Loading...</span></div>
+                    <div class="song-info"><strong>Album:</strong> <span id="np-album">Loading...</span></div>
+                    <div class="song-info"><strong>Requester:</strong> <span id="np-requester">Loading...</span></div>
+                    <img id="np-albumart" class="album-art" src="" alt="Album Art" style="display:none;">
+                </div>
+                <div class="controls">
+                    <button id="skipBtn" class="btn btn-danger hidden" onclick="skipSong()">⏭️ Skip Song</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Next Coming</h2>
+                <div id="next-coming">
+                    <div class="song-info"><strong>Title:</strong> <span id="nc-title">Loading...</span></div>
+                    <div class="song-info"><strong>Artist:</strong> <span id="nc-artist">Loading...</span></div>
+                    <div class="song-info"><strong>Duration:</strong> <span id="nc-duration">Loading...</span></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Request Queue</h2>
+                <div id="queue">
+                    <p>Loading queue...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let ws = null;
+        let token = localStorage.getItem('access_token');
+        let currentUser = null;
+        
+        // Show login or dashboard based on token
+        if (token) {
+            verifyToken();
+        } else {
+            showLoginModal();
+        }
+        
+        async function verifyToken() {
+            try {
+                const res = await fetch('/api/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser = data.user;
+                    hideLoginModal();
+                    setupDashboard();
+                } else {
+                    localStorage.removeItem('access_token');
+                    showLoginModal();
+                }
+            } catch (error) {
+                console.error('Token verification failed:', error);
+                localStorage.removeItem('access_token');
+                showLoginModal();
+            }
+        }
+        
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+        
+        function hideLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+        
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('modalTitle').textContent = 'Login to Pew Hits Radio';
+            document.getElementById('signupError').textContent = '';
+        }
+        
+        function showSignup() {
+            document.getElementById('signupForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('modalTitle').textContent = 'Create Account';
+            document.getElementById('loginError').textContent = '';
+        }
+        
+        async function handleLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            
+            if (!username || !password) {
+                errorEl.textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    token = data.access_token;
+                    localStorage.setItem('access_token', token);
+                    currentUser = data.user;
+                    hideLoginModal();
+                    setupDashboard();
+                } else {
+                    errorEl.textContent = data.error || 'Login failed';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Network error. Please try again.';
+            }
+        }
+        
+        async function handleSignup() {
+            const email = document.getElementById('signupEmail').value;
+            const username = document.getElementById('signupUsername').value;
+            const password = document.getElementById('signupPassword').value;
+            const errorEl = document.getElementById('signupError');
+            
+            if (!email || !username || !password) {
+                errorEl.textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, username, password })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    token = data.access_token;
+                    localStorage.setItem('access_token', token);
+                    currentUser = data.user;
+                    hideLoginModal();
+                    setupDashboard();
+                } else {
+                    errorEl.textContent = data.error || 'Signup failed';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Network error. Please try again.';
+            }
+        }
+        
+        function handleLogout() {
+            localStorage.removeItem('access_token');
+            token = null;
+            currentUser = null;
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('userBar').classList.add('hidden');
+            showLoginModal();
+        }
+        
+        function setupDashboard() {
+            // Show user info
+            document.getElementById('username').textContent = currentUser.username;
+            document.getElementById('roleBadge').textContent = currentUser.role;
+            document.getElementById('roleBadge').className = `role-badge role-${currentUser.role}`;
+            document.getElementById('userBar').classList.remove('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            // Show skip button for DJ and Admin
+            if (currentUser.role === 'dj' || currentUser.role === 'admin') {
+                document.getElementById('skipBtn').classList.remove('hidden');
+            }
+            
+            // Connect WebSocket
+            connectWebSocket();
+        }
+        
+        function connectWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsHost = window.location.host;
+            const wsPort = window.location.port || (window.location.protocol === 'https:' ? '443' : '80');
+            ws = new WebSocket(`${wsProtocol}//${wsHost.split(':')[0]}:9626/ws`);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                document.getElementById('wsStatus').textContent = '● Connected';
+                document.getElementById('wsStatus').classList.remove('offline');
+                document.getElementById('wsStatus').classList.add('live');
+                
+                // Send authentication token
+                ws.send(JSON.stringify({ token: token }));
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message:', data);
+                
+                if (data.action === 'broadcast_now_playing') {
+                    updateNowPlaying(data.song);
+                } else if (data.action === 'broadcast_next_coming') {
+                    updateNextComing(data.song);
+                } else if (data.action === 'broadcast_queue') {
+                    updateQueue(data.queue);
+                }
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                document.getElementById('wsStatus').textContent = '⚫ Disconnected';
+                document.getElementById('wsStatus').classList.remove('live');
+                document.getElementById('wsStatus').classList.add('offline');
+                
+                // Reconnect after 5 seconds
+                setTimeout(connectWebSocket, 5000);
+            };
+        }
+        
+        function updateNowPlaying(song) {
+            if (song) {
+                document.getElementById('np-title').textContent = song.title || 'N/A';
+                document.getElementById('np-artist').textContent = song.artist || 'N/A';
+                document.getElementById('np-album').textContent = song.album || 'N/A';
+                document.getElementById('np-requester').textContent = song.requester || 'PewDJ';
+                
+                if (song.albumart) {
+                    document.getElementById('np-albumart').src = song.albumart;
+                    document.getElementById('np-albumart').style.display = 'block';
+                } else {
+                    document.getElementById('np-albumart').style.display = 'none';
+                }
+            }
+        }
+        
+        function updateNextComing(song) {
+            if (song) {
+                document.getElementById('nc-title').textContent = song.title || 'N/A';
+                document.getElementById('nc-artist').textContent = song.artist || 'N/A';
+                document.getElementById('nc-duration').textContent = song.durationsec ? `${song.durationsec}s` : 'N/A';
+            }
+        }
+        
+        function updateQueue(queue) {
+            const queueDiv = document.getElementById('queue');
+            if (!queue || queue.length === 0) {
+                queueDiv.innerHTML = '<p>No songs in queue</p>';
+            } else {
+                queueDiv.innerHTML = queue.map((song, i) => `
+                    <div class="queue-item">
+                        <strong>${i + 1}.</strong> ${song.title} - ${song.artist}<br>
+                        <small>Requested by: ${song.requester}</small>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        async function skipSong() {
+            try {
+                const res = await fetch('/skip', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    console.log('Song skipped:', data.message);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Failed to skip song: ' + error);
+            }
+        }
+    </script>
+</body>
+</html>
