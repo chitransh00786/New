@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "user_id": "2",
+        "username": "1LoVVe",
+        "email": "jitu@gmail.com",
+        "status": "denied",
+        "requested_at": "2025-10-27T05:48:46.739379",
+        "denied_by": "admin",
+        "denied_at": "2025-10-27T05:49:10.548809"
+    }
+]
