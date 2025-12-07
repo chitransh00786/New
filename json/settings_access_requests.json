@@ -1,0 +1,27 @@
+{
+    "requests": [
+        {
+            "id": 1,
+            "username": "pewhits",
+            "reason": "",
+            "status": "denied",
+            "created_at": "2025-10-27T16:51:12.272773",
+            "admin_response": "",
+            "admin_username": "admin",
+            "updated_at": "2025-10-27T16:51:28.067537"
+        },
+        {
+            "id": 2,
+            "username": "pewhits",
+            "reason": "",
+            "status": "approved",
+            "created_at": "2025-10-27T16:51:36.980278",
+            "admin_response": "",
+            "admin_username": "admin",
+            "updated_at": "2025-10-27T16:52:12.436553"
+        }
+    ],
+    "approved_users": [
+        "pewhits"
+    ]
+}
