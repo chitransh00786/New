@@ -1,0 +1,82 @@
+p.webshare.io:80:vvjqdrxe-rotate:ricpml0wqyg4
+p.webshare.io:80:xpylbkjq-rotate:i8omcgct4mo7
+p.webshare.io:80:uylyksrz-rotate:wjhjg6ccxy1v
+
+
+async def stream_single_file(sock, file_path: str, is_promo: bool = False) -> bool:
+    """
+    Stream a single audio file to Icecast with full reconnect support.
+    """
+    if not os.path.exists(file_path):
+        print(f"[STREAM] File not found: {file_path}")
+        return True
+
+    while True:  # retry loop for reconnects
+        try:
+            ffmpeg_process = subprocess.Popen(
+                ["ffmpeg", "-hide_banner", "-loglevel", "error", "-re", "-i", file_path,
+                "-c:a", "libmp3lame", "-b:a", config.BITRATE,
+                "-ar", "44100", "-f", "mp3", "-"],
+                stdout=subprocess.PIPE
+            )
+
+            if ffmpeg_process.stdout is None:
+                print("[STREAM] Failed to get ffmpeg stdout")
+                return True
+
+            chunk_count = 0
+            while True:
+                chunk = ffmpeg_process.stdout.read(4096)
+                if not chunk:
+                    print(f"[STREAM] Finished {'promo' if is_promo else 'song'}")
+                    break
+
+                if skip.skip_status and not is_promo:
+                    print("⏭️ Skip initiated, skipping to next song")
+                    skip.skip_status = False
+                    skip.stop_counter = True
+                    ffmpeg_process.terminate()
+                    return True
+
+                try:
+                    sock.sendall(chunk)
+                    chunk_count += 1
+
+                    # Health check every ~4 MB
+                    if chunk_count % 1000 == 0:
+                        try:
+                            sock.getpeername()
+                        except OSError:
+                            raise ConnectionResetError("Socket health check failed")
+
+                except (BrokenPipeError, ConnectionResetError, OSError) as err:
+                    print(f"[STREAM] Connection lost: {err}")
+                    ffmpeg_process.terminate()
+                    ffmpeg_process.wait(timeout=3)
+
+                    # Try reconnecting to Icecast
+                    new_sock = connect_to_icecast()
+                    if not new_sock:
+                        print("❌ Icecast reconnection failed; aborting stream.")
+                        return False
+
+                    print("✅ Reconnected to Icecast, restarting ffmpeg pipeline...")
+                    sock = new_sock
+                    break  # Restart outer loop (new ffmpeg tied to new socket)
+
+                await asyncio.sleep(0.01)
+
+            ffmpeg_process.terminate()
+            ffmpeg_process.wait()
+            gc.collect()
+
+            # Completed normally — break outer loop
+            break
+
+        except Exception as e:
+            print(f"[STREAM] Error streaming {file_path}: {e}")
+            await asyncio.sleep(3)
+            # try again after short delay (reconnect logic handled above)
+            continue
+
+    return True
