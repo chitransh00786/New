@@ -1,0 +1,99 @@
+{
+    "endpoints": {
+        "api_search": {
+            "enabled": true,
+            "display_name": "Song Search",
+            "description": "Enable/disable Spotify song search"
+        },
+        "api_play": {
+            "enabled": true,
+            "display_name": "Play Request",
+            "description": "Enable/disable song requests"
+        },
+        "api_play_youtube": {
+            "enabled": true,
+            "display_name": "YouTube Play",
+            "description": "Enable/disable YouTube direct requests"
+        },
+        "api_skip": {
+            "enabled": true,
+            "display_name": "Skip Song",
+            "description": "Enable/disable song skip feature"
+        },
+        "api_queue_remove": {
+            "enabled": true,
+            "display_name": "Queue Remove",
+            "description": "Enable/disable removing songs from queue"
+        },
+        "api_queue_move_top": {
+            "enabled": true,
+            "display_name": "Move to Top",
+            "description": "Enable/disable moving songs to queue top"
+        },
+        "api_playlists": {
+            "enabled": true,
+            "display_name": "Playlist Management",
+            "description": "Enable/disable playlist management"
+        },
+        "api_now_playing": {
+            "enabled": true,
+            "display_name": "Now Playing",
+            "description": "Enable/disable now playing endpoint"
+        },
+        "api_next_coming": {
+            "enabled": true,
+            "display_name": "Next Coming",
+            "description": "Enable/disable next coming endpoint"
+        },
+        "api_queue": {
+            "enabled": true,
+            "display_name": "Queue List",
+            "description": "Enable/disable queue list endpoint"
+        },
+        "api_recommendations": {
+            "enabled": true,
+            "display_name": "Recommendations",
+            "description": "Enable/disable song recommendations"
+        }
+    },
+    "broadcasts": {
+        "ws_now_playing": {
+            "enabled": true,
+            "display_name": "Now Playing Broadcast",
+            "description": "Enable/disable live now playing updates"
+        },
+        "ws_next_coming": {
+            "enabled": true,
+            "display_name": "Next Coming Broadcast",
+            "description": "Enable/disable next song updates"
+        },
+        "ws_queue": {
+            "enabled": true,
+            "display_name": "Queue Broadcast",
+            "description": "Enable/disable queue updates"
+        },
+        "ws_playlists": {
+            "enabled": true,
+            "display_name": "Playlist Broadcast",
+            "description": "Enable/disable playlist updates"
+        }
+    },
+    "features": {
+        "feature_requests": {
+            "enabled": true,
+            "display_name": "Song Requests",
+            "description": "Enable/disable all song request features"
+        },
+        "feature_skip": {
+            "enabled": true,
+            "display_name": "Skip Feature",
+            "description": "Enable/disable skip functionality"
+        },
+        "feature_youtube": {
+            "enabled": true,
+            "display_name": "YouTube Support",
+            "description": "Enable/disable YouTube direct requests"
+        }
+    },
+    "last_updated": "2025-10-27T16:59:18.251032"
+}
